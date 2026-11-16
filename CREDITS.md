@@ -1,5 +1,8 @@
 # Credits
 
+The MIT licence in `LICENSE` covers the town's own code and its own tune (song 1). Everything else listed here
+comes from other people and keeps its own terms.
+
 ## Music
 
 Songs 2 to 8 are CC0 / public domain, as stated on each track's own page. The files here are trimmed and
