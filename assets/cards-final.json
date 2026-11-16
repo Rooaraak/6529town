@@ -1,0 +1,98 @@
+[
+ {
+  "id": 2,
+  "name": "Seize JPGs",
+  "artist": "6529er",
+  "file": "cards/2.webp",
+  "w": 287,
+  "h": 420
+ },
+ {
+  "id": 3,
+  "name": "Uncle Seize",
+  "artist": "6529er",
+  "file": "cards/3.webp",
+  "w": 287,
+  "h": 420
+ },
+ {
+  "id": 52,
+  "name": "MEME FACTORY",
+  "artist": "Grant Riven Yun",
+  "file": "cards/52.webp",
+  "w": 315,
+  "h": 420
+ },
+ {
+  "id": 85,
+  "name": "Digital Rights Are Human Rights",
+  "artist": "6529er",
+  "file": "cards/85.webp",
+  "w": 319,
+  "h": 420
+ },
+ {
+  "id": 103,
+  "name": "Don't Trust, Check.",
+  "artist": "Jack Butcher",
+  "file": "cards/103.webp",
+  "w": 420,
+  "h": 420
+ },
+ {
+  "id": 150,
+  "name": "MEME CITY",
+  "artist": "Efdot",
+  "file": "cards/150.webp",
+  "w": 300,
+  "h": 420
+ },
+ {
+  "id": 154,
+  "name": "Meme Abduction",
+  "artist": "PRGuitarman",
+  "file": "cards/154.webp",
+  "w": 420,
+  "h": 420
+ },
+ {
+  "id": 345,
+  "name": "We Are The Meme Builders",
+  "artist": "Xose Casal",
+  "file": "cards/345.webp",
+  "w": 317,
+  "h": 420
+ },
+ {
+  "id": 450,
+  "name": "A Node from the Outer Rim",
+  "artist": "intrepid",
+  "file": "cards/450.webp",
+  "w": 315,
+  "h": 420
+ },
+ {
+  "id": 470,
+  "name": "The Great Wave of Decentralization",
+  "artist": "Kanetix",
+  "file": "cards/470.webp",
+  "w": 280,
+  "h": 420
+ },
+ {
+  "id": 556,
+  "name": "Refuge",
+  "artist": "intrepid",
+  "file": "cards/556.webp",
+  "w": 280,
+  "h": 420
+ },
+ {
+  "id": 570,
+  "name": "Networked Mind",
+  "artist": "Teyhu",
+  "file": "cards/570.webp",
+  "w": 296,
+  "h": 420
+ }
+]

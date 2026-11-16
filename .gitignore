@@ -1,0 +1,30 @@
+# private: readings of your validator (wallet addresses, key codes) and everything built from them
+raw/
+data/
+dist*/
+stage/
+network-history.jsonl
+# your own settings, private words and secret files (keep the secret files outside this folder anyway)
+config.env*
+!config.example.env
+leak-extra.txt*
+*token*
+*account*
+*webhook*
+# leftovers of a text editor (they can hold a copy of config.env or leak-extra.txt)
+.*.sw?
+*~
+.#*
+\#*#
+*.kate-swp
+# run files
+*.log
+*.tmp
+.last-fail-day
+.day-guard.msg
+.daily.lock
+crontab.bak-*
+node_modules/
+chrome/
+chrome-headless-shell/
+__pycache__/

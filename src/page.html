@@ -1,0 +1,1267 @@
+<title>6529 Town</title>
+<meta name="description" content="An imaginary town that grows with the 6529 validator network, one house per validator. Unofficial community project.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Big+Shoulders+Stencil+Display:wght@700;900&family=Archivo:wdth,wght@62..125,300..900&family=Martian+Mono:wght@300..600&display=swap">
+<style>
+/* 6529 Town. Night palette (near-black surfaces, thin grey rules, white type) with the founding Meme Cards' poster
+   language on top: red sun, stencil headlines, cream paper houses with lit windows. */
+:root{
+  --bg:#000; --bg-1:#0a0a0b; --surface:#131316; --surface-2:#1c1c21; --line:#26272b; --line-2:#37373e;
+  --text:#efeff1; --text-2:#cecfd4; --muted:#9a9a9a; --muted-2:#848490;
+  --red:#c8291e; --red-hi:#e0402f; --red-deep:#5c130d; --gold:#e8d48a; --win:#ffcf6b; --cream:#efe5cf; --teal:#2f7f86;
+  --f-poster:"Big Shoulders Stencil Display","Anton",Impact,"Arial Narrow",sans-serif;
+  --f-head:"Anton",Impact,"Arial Narrow",sans-serif;
+  --f-body:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --f-mono:"Martian Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f-body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button,a{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.mono{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase}
+
+/* ---------- night poster ---------- */
+.poster{position:relative;overflow:hidden;background:
+  radial-gradient(ellipse 60% 48% at 50% 52%,rgba(200,41,30,.16),transparent 70%),
+  repeating-conic-gradient(from -3.75deg at 50% 52%,#0b0b0d 0deg 7.5deg,#050506 7.5deg 15deg)}
+.poster::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1.4px);background-size:5px 5px;
+  -webkit-mask-image:radial-gradient(circle at 50% 52%,transparent 25%,#000 80%);mask-image:radial-gradient(circle at 50% 52%,transparent 25%,#000 80%)}
+.frame{position:absolute;z-index:1;pointer-events:none;inset:calc(12px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 12px max(12px,env(safe-area-inset-left,0px));border:1px solid var(--line-2);border-radius:14px}
+.poster-in{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;
+  padding-block:calc(28px + env(safe-area-inset-top,0px)) 36px;
+  padding-left:max(28px,calc(16px + env(safe-area-inset-left,0px)));padding-right:max(28px,calc(16px + env(safe-area-inset-right,0px)))}
+.p-top{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px 16px;flex-wrap:wrap;color:var(--muted)}
+.brand{display:flex;align-items:center;gap:10px;color:var(--text-2)}
+.hmark{width:22px;height:20px;position:relative;flex:none}
+.hmark::before{content:"";position:absolute;left:0;right:0;top:0;height:10px;background:var(--red);clip-path:polygon(50% 0,100% 100%,0 100%)}
+.hmark::after{content:"";position:absolute;left:3px;right:3px;bottom:0;height:10px;background:var(--cream);
+  background-image:linear-gradient(var(--win),var(--win));background-size:6px 5px;background-repeat:no-repeat;background-position:50% 2px}
+.kicker{margin:0;color:var(--muted)}
+.headline{margin:0;font-family:var(--f-poster);font-weight:900;text-transform:uppercase;line-height:.82;letter-spacing:.01em;
+  font-size:clamp(50px,7.2vw,100px);color:var(--text);text-shadow:.035em .035em 0 var(--red)}
+.titlebar{width:min(100%,1180px);margin-top:16px;display:flex;align-items:flex-end;justify-content:space-between;gap:14px 28px;flex-wrap:wrap}
+.titlebar .tl{min-width:0}
+/* first screen: link to the official site */
+.home-l{margin:12px 0 0;color:var(--muted);line-height:1.7}
+.home-l a{color:var(--gold);text-transform:none;letter-spacing:.08em;white-space:nowrap;padding:9px 4px;margin:0 -4px;text-decoration:underline;text-decoration-color:var(--line-2);text-decoration-thickness:1px;text-underline-offset:4px}
+.home-l a:hover{text-decoration-color:var(--gold)}
+.home-l a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+@media (min-width:901px){.home-l{font-size:12px}}
+.notice{width:min(100%,1180px);margin-top:16px;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.nt-band{display:none;justify-content:space-between;align-items:center;gap:12px;padding:11px 18px 0;font-family:var(--f-mono);font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.nt-band span{white-space:nowrap;min-width:0}
+#s-state{display:inline-flex;align-items:center;gap:7px;flex:none}
+#s-state.live{color:var(--win)}
+#s-state.live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--win);animation:nt-blink 1.8s ease-in-out infinite}
+@keyframes nt-blink{50%{opacity:.25}}
+#s-name-l.open{display:inline-flex;align-items:center;gap:7px}
+#s-name-l.open::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--win);animation:nt-blink 1.8s ease-in-out infinite}
+.nt-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr) minmax(0,1.7fr);align-items:center;gap:10px 30px;padding:13px 18px 13px}
+.nt-body > *{min-width:0}
+.notice button{font:inherit;color:inherit;background:none;border:0;margin:0;padding:0;cursor:pointer;text-align:left;-webkit-tap-highlight-color:transparent}
+.notice :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.nt-res{display:flex;align-items:baseline;flex-wrap:wrap;gap:0 10px;width:100%}
+.nt-res b{font-family:var(--f-head);font-weight:400;text-transform:uppercase;font-size:clamp(27px,2.5vw,34px);line-height:1.1;letter-spacing:.015em;color:var(--cream);transition:color .2s}
+.nt-k{font-size:12px;color:var(--muted)}
+.nt-res[aria-pressed="true"] b{color:var(--win)}
+.nt-agree{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:5px 12px}
+.nt-pct{display:contents}
+.nt-pct b{grid-area:1/1;font-family:var(--f-head);font-weight:400;font-size:25px;line-height:1;color:var(--win);font-variant-numeric:tabular-nums}
+.nt-pct span{grid-area:2/1/3/3;font-size:12px;line-height:1.35;color:var(--muted);text-wrap:balance}
+.nt-meter{grid-area:1/2;position:relative;height:8px;background:var(--line-2);border-radius:99px}
+.nt-meter i{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--win);border-radius:99px;transition:width .6s cubic-bezier(.2,.7,.2,1)}
+.nt-meter u{position:absolute;left:66.667%;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--text);border-radius:1px}
+.nt-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;align-items:stretch}
+.nt-facts button{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"ic n" "ic l";align-items:center;align-content:start;column-gap:10px;row-gap:1px;padding:6px 9px;border-radius:11px;min-width:0;box-shadow:inset 0 0 0 1px var(--line-2);transition:background-color .2s,box-shadow .2s}
+.nt-facts canvas{grid-area:ic;width:32px;height:32px;display:block;background:var(--bg-1);border:1px solid var(--line);border-radius:8px}
+.nt-facts b{grid-area:n;align-self:end;font-family:var(--f-head);font-weight:400;font-size:21px;line-height:1.05;font-variant-numeric:tabular-nums;white-space:nowrap;transition:color .2s}
+.nt-facts small{grid-area:l;align-self:start;font-size:11.5px;line-height:1.2;color:var(--muted)}
+.nt-facts button[aria-pressed="true"]{background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--win)}
+.nt-facts button[aria-pressed="true"] b{color:var(--win)}
+@media (hover:hover){.nt-facts button[aria-pressed="false"]:hover{background:var(--surface-2)}.nt-res:hover b{color:var(--win)}}
+.nt-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:5px 18px;padding:9px 18px 10px;border-top:1px solid var(--line);font-size:11.5px;line-height:1.35;color:var(--muted)}
+.nt-tdh{display:flex;flex-wrap:wrap;align-items:center;gap:3px 20px;font-size:13px;line-height:1.2;color:var(--text-2)}
+.nt-tdh > span{display:inline-flex;align-items:baseline;gap:7px;white-space:nowrap}
+.nt-tdh b{font-family:var(--f-head);font-weight:400;font-size:22px;line-height:1.05;letter-spacing:.01em;font-variant-numeric:tabular-nums;color:var(--cream)}
+.nt-tdh-s b{color:var(--win)}
+.nt-ring{--p:0;align-self:center;flex:none;width:17px;height:17px;border-radius:50%;background:conic-gradient(var(--win) calc(var(--p)*1%),var(--line-2) 0);-webkit-mask:radial-gradient(circle,transparent 4.2px,#000 4.8px);mask:radial-gradient(circle,transparent 4.2px,#000 4.8px)}
+.nt-foot span:empty{display:none}
+.nt-when{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;min-width:0}
+#s-read.old{color:var(--win)}
+#s-fresh{appearance:none;-webkit-appearance:none;border:1px solid var(--line-2);border-radius:999px;background:transparent;color:var(--win);font:inherit;padding:3px 10px;cursor:pointer;transition:border-color .2s}
+#s-fresh:hover{border-color:var(--win)}
+#s-fresh:focus-visible{outline:2px solid var(--win);outline-offset:2px}
+@media (min-width:901px){.titlebar{order:-2}.notice{order:-1}}
+@media (max-width:900px){.viewport .view-stage{border-bottom-left-radius:0;border-bottom-right-radius:0}.notice{margin-top:0;border-top:0;border-radius:0 0 16px 16px}
+  .nt-body{grid-template-columns:minmax(0,1fr);gap:11px;padding:12px 14px 12px}.nt-foot{padding:9px 14px 10px}.nt-tdh{gap:3px 16px}.nt-tdh b{font-size:21px}.nt-res b{font-size:29px}
+  .nt-facts{grid-template-columns:repeat(3,minmax(0,auto));justify-content:stretch;gap:6px}.nt-facts button{grid-template-areas:"ic n" "l l";row-gap:5px;padding:6px 7px 7px}.nt-facts canvas{width:28px;height:28px}.nt-facts b{align-self:center}}
+@media (prefers-reduced-motion:reduce){.nt-meter i{transition:none}#s-state.live::before,#s-name-l.open::before{animation:none}}
+.toolbar{width:min(100%,1180px);margin-top:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.tools{position:relative;display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.share-pop{position:absolute;right:0;top:calc(100% + 8px);z-index:6;display:flex;flex-direction:column;gap:6px;background:var(--surface);border:1px solid var(--line-2);border-radius:14px;padding:8px;box-shadow:0 14px 40px rgba(0,0,0,.6)}
+.share-pop .btn{justify-content:center;white-space:nowrap}
+.pc{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.86);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.pc-box{display:flex;flex-direction:column;align-items:center;gap:16px;max-width:min(940px,100%)}
+.pc-box img{display:block;max-width:100%;max-height:calc(100vh - 190px);max-height:calc(100dvh - 190px);width:auto;height:auto;border-radius:5px;box-shadow:0 30px 80px rgba(0,0,0,.75);transform:rotate(-1.1deg);animation:pcIn .5s cubic-bezier(.2,.7,.2,1)}
+@keyframes pcIn{from{opacity:0;transform:translateY(18px) rotate(-3.5deg) scale(.95)}to{opacity:1;transform:rotate(-1.1deg)}}
+@media (prefers-reduced-motion:reduce){.pc-box img{animation:none}}
+.pc-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center}
+.pc-row .btn{padding:11px 16px;text-decoration:none;justify-content:center}
+.pc-pick{display:inline-flex;gap:3px;padding:3px;border:1px solid var(--line-2);border-radius:12px;background:var(--surface)}
+.pc-pick button{border:0;border-radius:9px;background:transparent;color:var(--muted);padding:9px 12px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer}
+.pc-pick button[aria-pressed="true"]{background:var(--surface-2);color:var(--text)}
+.pc-tip{margin:0;color:var(--muted);text-align:center}
+.tour-go.find-go{top:60px;background:var(--surface);border-color:var(--line-2);color:var(--text)}
+.tour-go.find-go:hover{background:var(--surface-2)}
+.find{position:absolute;left:12px;top:60px;z-index:5;width:min(380px,calc(100% - 24px));background:rgba(19,19,22,.96);border:1px solid var(--line-2);border-radius:14px;padding:12px 14px;box-shadow:0 14px 40px rgba(0,0,0,.6)}
+.find label{display:block;color:var(--muted);margin:0 26px 8px 0}
+.find-row{display:flex;gap:8px}
+.find-row input{flex:1;min-width:0;background:var(--bg-1);border:1px solid var(--line-2);border-radius:10px;color:var(--text);padding:10px;font-family:var(--f-mono);font-size:12px}
+.find-row input:focus{outline:2px solid var(--gold);outline-offset:1px}
+.find-row .btn{padding:10px 14px}
+.find-msg{margin:8px 0 0;font-size:12px;line-height:1.45;color:var(--muted)}
+.find-msg.bad{color:#ff8f7a}
+.find .x{position:absolute;right:8px;top:6px;border:0;background:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px 7px;border-radius:8px}
+.tour-go.mine-go{top:108px;background:var(--surface);border-color:var(--gold);color:var(--gold)}
+.tour-go.mine-go:hover{background:var(--surface-2)}
+.mine-go b{font-weight:400;max-width:16ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mine-row{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.mine-row input{flex:1;min-width:0;background:var(--bg-1);border:1px solid var(--line-2);border-radius:10px;color:var(--text);padding:9px 10px;font:inherit;font-size:13px}
+.mine-row input:focus{outline:2px solid var(--gold);outline-offset:1px}
+.mine-row .btn{padding:9px 12px}
+.mine-own{margin:0!important;flex:1;color:var(--gold)!important;font-weight:600}
+.banner{position:absolute;left:50%;top:22%;z-index:5;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.banner b{display:block;font-family:var(--f-poster);font-weight:900;font-size:clamp(46px,7vw,96px);line-height:.9;text-transform:uppercase;color:var(--win);text-shadow:.04em .04em 0 var(--red),0 0 30px rgba(0,0,0,.6)}
+.banner span{display:inline-block;margin-top:10px;font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;background:rgba(19,19,22,.9);border:1px solid var(--line-2);border-radius:10px;padding:6px 10px;color:var(--text)}
+.banner.go{animation:bannerIn 5.2s cubic-bezier(.2,.8,.2,1) both}
+@keyframes bannerIn{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}10%{opacity:1;transform:translate(-50%,-50%) scale(1.06)}16%{transform:translate(-50%,-50%) scale(1)}85%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+@media (prefers-reduced-motion:reduce){.banner.go{animation:none}}
+@media (max-width:640px){.tour-go.find-go,.find{top:50px}.tour-go.mine-go{top:90px}.find{left:8px;width:calc(100% - 16px)}}
+.tools .btn{padding:10px 14px}
+@media (max-width:560px){.toolbar{gap:8px}.views{width:100%}.tab{flex:1;padding:9px 8px;font-size:10px}.tools{width:100%;flex-wrap:nowrap}.tools .btn{flex:1;justify-content:center;padding:9px 8px;font-size:10px;letter-spacing:.1em}}
+
+[hidden]{display:none!important}
+.views{display:flex;gap:6px;padding:4px;background:var(--surface);border:1px solid var(--line-2);border-radius:14px}
+.tab{border:0;border-radius:10px;background:transparent;color:var(--muted);padding:10px 16px;font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:background-color .2s,color .2s}
+.tab:hover{color:var(--text)}
+.tab[aria-selected="true"]{background:var(--text);color:#000}
+.viewport{position:relative;width:min(100%,1180px);margin-top:10px;height:clamp(420px,calc(100svh - 120px),740px)}
+.view-stage{position:absolute;inset:0;border:1px solid var(--line);border-radius:18px;overflow:hidden;
+  background:radial-gradient(ellipse 70% 60% at 50% 55%,rgba(200,41,30,.10),transparent 70%),#050506;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab;
+  transition:opacity .5s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+.view-stage.drag{cursor:grabbing}
+.view-stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.view-stage.out{opacity:0;transform:scale(.86)}
+.view-stage.pre{opacity:0;transform:scale(1.14);transition:none}
+@media (max-width:640px){.viewport{height:min(125vw,620px)}.view-stage{border-radius:14px}}
+.legend-chips{position:absolute;left:12px;bottom:12px;right:12px;display:flex;flex-wrap:wrap;gap:6px;pointer-events:none}
+.legend-chips .chip{background:rgba(19,19,22,.86);pointer-events:auto;cursor:pointer;font:inherit;font-size:12.5px;transition:border-color .2s,opacity .2s,background-color .2s}
+.legend-chips .chip:hover{border-color:var(--muted-2)}
+.legend-chips.filtering .chip{opacity:.55}
+.legend-chips .chip[aria-pressed="true"]{opacity:1;border-color:var(--text);background:rgba(239,239,241,.12)}
+@media (max-width:640px){.legend-chips{left:8px;right:8px;bottom:8px;gap:4px}.legend-chips .chip{padding:4px 8px;font-size:11px}.legend-chips .chip b{font-size:13px}}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:12.5px;color:var(--text-2)}
+.chip i{width:12px;height:9px;flex:none;clip-path:polygon(50% 0,100% 100%,0 100%);display:block}
+.chip i.dc{clip-path:none;width:8px;height:13px;background:#3a3a42;box-shadow:inset 0 3px 0 #00e0f0}
+.chip b{font-family:var(--f-head);font-weight:400;font-size:15px;color:var(--text);font-variant-numeric:tabular-nums}
+.stage{position:relative;width:min(100%,780px,max(400px,calc(100svh - 150px)));aspect-ratio:1;margin-top:10px;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
+.stage.drag{cursor:grabbing}
+#town{position:absolute;inset:0;width:100%;height:100%;display:block}
+.lab{position:absolute;left:0;top:0;pointer-events:none;opacity:0;transition:opacity .35s;display:flex;flex-direction:column;align-items:center;white-space:nowrap}
+.lab.on{opacity:1}
+.lab .tag{background:var(--surface);border:1px solid var(--line-2);border-radius:10px;color:var(--text);padding:6px 10px 7px;font-family:var(--f-head);font-size:14px;line-height:1.05;letter-spacing:.05em;text-transform:uppercase;text-align:center;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+.lab .tag b{font-weight:400;color:var(--red-hi)}
+.lab .tag small{display:block;font-family:var(--f-mono);font-size:8.5px;letter-spacing:.12em;color:var(--muted);margin-top:4px}
+.lab .stem{width:1px;height:16px;background:var(--line-2)}
+@media (max-width:560px){.lab .tag{font-size:12px;padding:5px 8px 6px}.lab .tag small{font-size:7.5px}.lab .stem{height:10px}}
+.lab.q .tag{font-size:11px;padding:4px 8px 5px}.lab.q .tag b{color:var(--muted);margin-left:.45em}.lab.q .stem{height:10px}
+.lab.q .tag i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:.5em;position:relative;top:-1px;box-shadow:0 0 0 1px var(--line-2)}
+@media (max-width:560px){.lab.q .tag{font-size:10px;padding:3px 6px 4px}.lab.q .tag i{width:6px;height:6px}}
+.card{position:absolute;z-index:3;width:min(280px,80%);background:var(--surface);color:var(--text);border:1px solid var(--line-2);border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.6);
+  padding:15px 16px 16px;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;pointer-events:none}
+.card.on{opacity:1;transform:none;pointer-events:auto}
+#t-card.on~#t-tour{visibility:hidden}
+.card h3{margin:0 22px 0 0;font-family:var(--f-head);font-weight:400;font-size:21px;line-height:1.02;text-transform:uppercase;letter-spacing:.02em;color:var(--text)}
+.card h3::before{content:"";display:block;width:26px;height:3px;background:var(--red);margin-bottom:9px}
+.card p{margin:8px 0 0;font-size:13.5px;line-height:1.45;color:var(--text-2)}
+.card .x{position:absolute;right:8px;top:6px;border:0;background:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px 7px;border-radius:8px}
+.card .x:hover{background:var(--surface-2);color:var(--text)}
+.card img{display:block;width:74px;float:right;margin:2px 0 6px 12px;border-radius:6px;border:1px solid var(--line-2)}
+.card img.art{float:none;box-sizing:border-box;width:100%;height:132px;object-fit:contain;margin:10px 0 0;background:var(--bg);border-radius:8px}
+.card .next{display:inline-block;margin-top:10px;border:1px solid var(--line-2);background:none;color:var(--gold);border-radius:10px;padding:7px 12px;font:inherit;font-size:12.5px;cursor:pointer}
+.card .next:hover{background:var(--surface-2)}
+.card a.next{text-decoration:none}
+@media (pointer:coarse){.card .next{padding:11px 14px}}
+.card img.art.stg{height:158px}
+.nogl{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--f-mono);font-size:12px;text-align:center;max-width:30ch;line-height:1.6;color:var(--muted)}
+.hint{position:absolute;right:14px;top:12px;color:var(--muted-2);white-space:nowrap;pointer-events:none;transition:opacity .4s}
+
+/* town sign */
+.sign{position:relative;margin-top:4px;background:var(--surface);border:1px solid var(--line-2);border-radius:14px;max-width:100%;
+  display:grid;grid-template-columns:auto repeat(3,minmax(0,auto));align-items:stretch;box-shadow:0 18px 50px rgba(0,0,0,.55)}
+.sign::before,.sign::after{content:"";position:absolute;bottom:-30px;width:6px;height:29px;background:var(--line-2);border-radius:0 0 3px 3px}
+.sign::before{left:18%}.sign::after{right:18%}
+.sign .name{background:var(--red);color:var(--text);padding:12px 20px;display:flex;flex-direction:column;justify-content:center;border-radius:13px 0 0 13px}
+.sign .name b{font-family:var(--f-poster);font-weight:900;font-size:clamp(30px,4vw,44px);line-height:.85;letter-spacing:.02em;text-transform:uppercase}
+.sign .name span{margin-top:7px;color:rgba(239,239,241,.85)}
+.sign .pop{padding:11px 20px;border-left:1px solid var(--line);text-align:center;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.sign .pop b{font-family:var(--f-head);font-weight:400;font-size:clamp(28px,3.6vw,46px);line-height:1;font-variant-numeric:tabular-nums;color:var(--text)}
+.sign .pop:nth-child(2) b{color:var(--win)}
+.sign .pop span{margin-top:6px;font-size:9.5px;color:var(--muted)}
+@media (max-width:640px){
+  .sign{grid-template-columns:repeat(3,minmax(0,1fr));width:100%}
+  .sign .name{grid-column:1/-1;border-radius:13px 13px 0 0;flex-direction:row;align-items:baseline;justify-content:space-between;gap:10px;padding:10px 14px}
+  .sign .pop{padding:10px 6px}
+  .sign .pop:nth-child(2){border-left:0}
+  .sign .pop span{font-size:8.5px;letter-spacing:.08em}
+}
+
+/* timeline */
+.days{max-width:100%;display:flex;align-items:flex-end;gap:12px;min-width:0}
+.sky{display:flex;align-items:flex-end;gap:5px;height:78px;padding:0 2px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent;border-bottom:1px solid var(--line-2)}
+.bld{flex:none;width:30px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;padding:0;border:0;background:none;color:var(--muted);cursor:pointer}
+.bld i{display:block;width:100%;border:1px solid var(--line-2);border-bottom:0;border-radius:4px 4px 0 0;background-color:var(--surface-2);
+  background-image:radial-gradient(circle,#3a3a42 1.3px,transparent 1.8px);background-size:7px 8px;background-position:2px 4px;transition:background-color .2s,border-color .2s}
+.bld.old i{background-color:#1d1a15;border-color:#4a4032;background-image:radial-gradient(circle,#5a4c38 1.3px,transparent 1.8px)}
+.bld span{font-family:var(--f-mono);font-size:9px;letter-spacing:.06em;line-height:1;padding-bottom:3px}
+.bld:hover i{border-color:var(--muted-2)}
+.bld[aria-pressed="true"] i{border-color:var(--text);background-color:#2a2620;background-image:radial-gradient(circle,var(--win) 1.4px,transparent 1.9px);box-shadow:0 -3px 0 var(--red) inset}
+.bld[aria-pressed="true"] span{color:var(--text)}
+.bld.wip i{border-style:dashed;border-color:var(--gold)}
+.sky-cap{display:flex;flex-direction:column;gap:4px;padding-bottom:4px;min-width:0}
+.sky-cap b{font-family:var(--f-head);font-weight:400;font-size:18px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.sky-cap span{font-family:var(--f-mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.play{flex:none;width:46px;height:46px;border:0;border-radius:12px;background:var(--text);color:#000;cursor:pointer;display:grid;place-items:center;transition:background-color .2s}
+.play:hover{background:#fff}
+.play svg{width:15px;height:15px}
+.strip{flex:1;min-width:0;display:flex;gap:8px;overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent;padding:3px 2px 7px}
+.day{flex:none;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text);padding:8px 13px 9px;cursor:pointer;text-align:left;transition:background-color .2s,border-color .2s}
+.day b{display:block;font-family:var(--f-head);font-weight:400;font-size:17px;letter-spacing:.04em;text-transform:uppercase;line-height:1}
+.day span{display:block;margin-top:5px;font-family:var(--f-mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.day:hover{border-color:var(--line-2);background:var(--surface-2)}
+.day[aria-pressed="true"]{background:var(--text);border-color:var(--text);color:#000}
+.day[aria-pressed="true"] span{color:var(--red)}
+.p-actions{margin-top:22px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line-2);border-radius:12px;background:var(--surface);color:var(--text);padding:12px 18px;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;cursor:pointer;transition:background-color .2s,border-color .2s}
+.btn:hover{background:var(--surface-2);border-color:var(--muted-2)}
+.btn.solid{background:var(--red);border-color:var(--red)}
+.btn.solid:hover{background:var(--red-hi);border-color:var(--red-hi)}
+.key{width:min(100%,1180px);margin-top:8px;padding:0 2px}
+.key-lede{margin:0;font-size:12.5px;line-height:1.5;color:var(--muted);max-width:none;text-wrap:pretty}
+.key-lede b{color:var(--text-2);font-weight:600}
+.key-note{margin:0;font-size:12.5px;line-height:1.5;color:var(--win)}
+.key-note:empty{display:none}
+.key-note:not(:empty) + .key-lede{display:none}
+.chip i.mt{clip-path:polygon(50% 0,100% 42%,100% 100%,0 100%,0 42%);width:11px;height:11px;background:#5a5a66}
+.p-foot{margin-top:12px;width:min(100%,1180px);display:flex;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;color:var(--muted-2)}
+
+/* ---------- below the planet ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+@media (min-width:760px){.wrap{padding-left:max(40px,env(safe-area-inset-left,0px));padding-right:max(40px,env(safe-area-inset-right,0px))}}
+.sec{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:20px;row-gap:22px;padding-block:52px;border-bottom:1px solid var(--line)}
+.sec h2{grid-column:1/span 3;margin:0;font-family:var(--f-head);font-weight:400;font-size:30px;line-height:1;letter-spacing:.02em;text-transform:uppercase}
+.sec h2 small{display:block;margin-top:10px;font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;color:var(--muted);line-height:1.6}
+.body{grid-column:4/-1;min-width:0}
+@media (max-width:760px){.sec h2,.body{grid-column:1/-1}}
+.intro{padding-block:56px 44px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:20px;row-gap:22px;border-bottom:1px solid var(--line)}
+.intro h2{grid-column:1/-1;margin:0;font-family:var(--f-poster);font-weight:900;font-size:clamp(44px,7.4vw,104px);line-height:.86;text-transform:uppercase;letter-spacing:.01em}
+.intro h2 em{font-style:normal;color:var(--red-hi)}
+.intro p{grid-column:1/span 6;margin:0;font-size:16.5px;line-height:1.6;max-width:54ch;color:var(--text-2)}
+.legend{grid-column:8/-1;list-style:none;margin:0;padding:0;display:grid;gap:12px;align-content:start}
+.legend li{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:center;font-size:13.5px;line-height:1.4;color:var(--text-2)}
+.legend li b{color:var(--text);font-weight:600}
+.legend canvas{width:40px;height:40px;display:block;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.diary{display:grid;gap:8px}
+.drow{display:grid;grid-template-columns:minmax(96px,130px) minmax(0,1.5fr) repeat(3,minmax(0,1fr));gap:14px;align-items:center;width:100%;text-align:left;
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px;color:var(--text);cursor:pointer;transition:border-color .2s,background-color .2s}
+.drow:hover{border-color:var(--line-2);background:var(--surface-2)}
+.drow[aria-current="true"]{border-color:var(--text)}
+.drow .dd b{display:block;font-family:var(--f-head);font-weight:400;font-size:18px;letter-spacing:.03em;text-transform:uppercase}
+.drow .dd span,.drow .dv span{display:block;margin-top:3px;font-family:var(--f-mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.drow .dn{font-family:var(--f-poster);font-weight:900;font-size:clamp(22px,2.6vw,32px);line-height:.9;text-transform:uppercase;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drow .dv b{display:block;font-family:var(--f-head);font-weight:400;font-size:22px;font-variant-numeric:tabular-nums}
+.drow .dv b em{font-style:normal;font-size:14px;color:var(--win);margin-left:6px}
+@media (max-width:700px){.drow{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:10px}.drow .dd{grid-column:1/2}.drow .dn{grid-column:2/-1}}
+.credits{margin-top:10px!important;font-size:12px!important}
+.tip{position:absolute;left:0;top:0;z-index:4;pointer-events:none;opacity:0;transition:opacity .15s;background:rgba(19,19,22,.94);border:1px solid var(--line-2);border-radius:8px;padding:6px 9px;font-size:12px;color:var(--text);white-space:nowrap}
+.tip.on{opacity:1}
+.g-tip{white-space:normal;max-width:min(300px,82%);line-height:1.4;text-align:center}
+.tour-go{position:absolute;left:12px;top:12px;z-index:3;display:inline-flex;align-items:center;gap:9px;border:1px solid var(--red);border-radius:12px;background:var(--red);color:var(--text);
+  padding:10px 14px;font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.45);transition:background-color .2s}
+.tour-go:hover{background:var(--red-hi)}
+.tour-go svg{width:12px;height:12px}
+.tour{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:4;width:min(580px,calc(100% - 24px));background:rgba(19,19,22,.95);border:1px solid var(--line-2);border-radius:16px;
+  padding:14px 18px 14px;box-shadow:0 16px 44px rgba(0,0,0,.6)}
+.tour .mono{color:var(--red-hi)}
+.tour h3{margin:6px 30px 0 0;font-family:var(--f-head);font-weight:400;font-size:24px;line-height:1.02;letter-spacing:.02em;text-transform:uppercase}
+.tour p{margin:8px 0 0;font-size:14px;line-height:1.5;color:var(--text-2)}
+.tour-a{display:inline-block;margin-top:10px;border:1px solid var(--line-2);border-radius:10px;padding:7px 12px;color:var(--gold);font-size:13px;text-decoration:none}
+.tour-a:hover{background:var(--surface-2)}
+.tour-a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+@media (pointer:coarse){.tour-a{padding:11px 14px}}
+.tour-nav{margin-top:12px;display:flex;align-items:center;gap:10px}
+.tour-nav .btn{padding:9px 14px}
+.tour-nav .btn:disabled{opacity:.35;cursor:default}
+.tour .dots{flex:1;display:flex;gap:5px;justify-content:center;flex-wrap:wrap}
+.tour .dots i{width:6px;height:6px;border-radius:50%;background:var(--line-2)}
+.tour .dots i.on{background:var(--text)}
+.tour .x{position:absolute;right:8px;top:6px;border:0;background:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px;border-radius:8px}
+.tour .x:hover{background:var(--surface-2);color:var(--text)}
+@media (max-width:640px){.view-stage .hint{display:none}.tour{bottom:8px;padding:12px 14px}.tour h3{font-size:20px}.tour p{font-size:13px}.tour-go{left:8px;top:8px;padding:8px 11px;font-size:10px}}
+@media (max-width:860px){.intro p,.legend{grid-column:1/-1}}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
+.figs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.fig{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 16px 18px;min-width:0}
+.fig b{display:block;font-family:var(--f-head);font-weight:400;font-size:clamp(34px,4.2vw,56px);line-height:.95;font-variant-numeric:tabular-nums}
+.fig:first-child b{color:var(--win)}
+.fig span{display:block;margin-top:9px;font-size:13px;line-height:1.35;color:var(--muted)}
+@media (max-width:760px){.figs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.result{display:grid;grid-template-columns:auto minmax(0,1fr);gap:26px;align-items:center;margin-top:12px}
+.seal{width:128px;aspect-ratio:1;border-radius:50%;overflow:hidden;border:1px solid var(--line-2);box-shadow:0 0 0 6px var(--bg),0 0 0 7px var(--line)}
+.seal canvas{width:100%;height:100%;display:block}
+.result .mono{color:var(--muted)}
+.result h3{margin:6px 0 0;font-family:var(--f-poster);font-weight:900;font-size:clamp(42px,5.8vw,82px);line-height:.86;text-transform:uppercase}
+.result p{margin:12px 0 0;font-size:14.5px;line-height:1.55;max-width:60ch;color:var(--text-2)}
+@media (max-width:560px){.result{grid-template-columns:1fr}.seal{width:104px}}
+
+.goal{position:relative;margin-top:34px}
+.goal-track{position:relative;height:56px;background:var(--surface);border:1px solid var(--line-2);border-radius:12px;overflow:hidden}
+.goal-fill{position:absolute;inset:0 auto 0 0;width:0;background:repeating-linear-gradient(135deg,var(--red) 0 10px,#9e1f16 10px 20px);transition:width .6s}
+.goal-ticks{position:relative;height:22px;margin-top:9px;font-family:var(--f-mono);font-size:10px;color:var(--muted-2)}
+.goal-ticks span{position:absolute;transform:translateX(-50%);font-variant-numeric:tabular-nums}
+.goal-ticks span:first-child{left:0;transform:none}.goal-ticks span:last-child{left:100%;transform:translateX(-100%)}
+.goal-mark{position:absolute;top:-30px;left:0;transform:translateX(-50%);font-family:var(--f-head);font-size:19px;letter-spacing:.03em;white-space:nowrap;text-transform:uppercase;transition:left .6s}
+.note{margin:18px 0 0;font-size:13.5px;line-height:1.55;color:var(--muted);max-width:64ch}
+
+.two{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:14px}
+@media (max-width:900px){.two{grid-template-columns:minmax(0,1fr)}}
+.chart-t{margin:0 0 16px;color:var(--muted)}
+.rows{display:grid;gap:11px}
+.row{display:grid;grid-template-columns:minmax(100px,150px) minmax(0,1fr) 3.5ch;align-items:center;gap:14px;font-size:14px;color:var(--text-2)}
+.row .t{height:22px;background:var(--bg-1);border-radius:6px;position:relative;overflow:hidden}
+.row .t i{position:absolute;inset:0 auto 0 0;background:var(--text-2);border-radius:6px;transition:width .5s}
+.row.priv .t i{background:repeating-linear-gradient(135deg,var(--muted-2) 0 2px,transparent 2px 6px)}
+.row b{text-align:right;font-family:var(--f-head);font-weight:400;font-size:20px;font-variant-numeric:tabular-nums;color:var(--text)}
+.split{display:flex;gap:28px;flex-wrap:wrap}
+.split b{display:block;font-family:var(--f-head);font-weight:400;font-size:46px;line-height:1;font-variant-numeric:tabular-nums}
+.split span{font-size:13px;color:var(--muted)}
+.countries{margin:20px 0 0;font-size:13px;line-height:1.6;color:var(--muted);max-width:70ch}
+.stack{display:flex;height:34px;gap:2px;border-radius:8px;overflow:hidden;background:var(--bg-1)}
+.stack i{display:block;height:100%}
+.vlist{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px 16px;font-size:12.5px;color:var(--text-2)}
+.vlist li{display:flex;align-items:center;gap:7px}
+.vlist li i{width:11px;height:11px;border-radius:3px;flex:none}
+
+.band{position:relative;overflow:hidden;background:repeating-conic-gradient(from -3.75deg at 10% 50%,var(--red) 0deg 7.5deg,#a8231a 7.5deg 15deg)}
+.band .wrap{position:relative;padding-block:62px 56px;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:20px}
+.band blockquote{grid-column:2/-1;margin:0}
+.band blockquote p{margin:0;font-family:var(--f-poster);font-weight:900;font-size:clamp(40px,6.4vw,96px);line-height:.88;text-transform:uppercase;color:var(--text);text-shadow:.04em .04em 0 #000;max-width:15ch}
+.band cite{display:block;margin-top:22px;font-style:normal;color:rgba(239,239,241,.9);max-width:70ch;line-height:1.8}
+@media (max-width:760px){.band blockquote{grid-column:1/-1}}
+
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
+.gallery figure{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:border-color .2s}
+.gallery figure:hover{border-color:var(--line-2)}
+.gallery .pic{background:var(--bg-1);aspect-ratio:1;display:grid;place-items:center;padding:14px}
+.gallery img{display:block;max-width:100%;max-height:100%;object-fit:contain;border-radius:3px}
+.gallery figcaption{padding:12px 12px 14px;text-align:center}
+.gallery figcaption b{display:block;font-size:14px;font-weight:650;line-height:1.25;color:var(--text)}
+.gallery figcaption .n{display:block;margin-top:5px;font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;color:var(--muted-2)}
+.gallery figcaption .a{display:block;margin-top:4px;font-size:12.5px;color:var(--muted)}
+
+/* town records: one board under the town */
+/* get a house: the short guide under the town */
+.home-s{margin-top:2px}
+.start{padding-block:40px 44px;border-bottom:1px solid var(--line)}
+.st{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.st-c{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px 18px;min-width:0;display:flex;flex-direction:column;align-items:flex-start}
+.st-c h3{margin:0 0 10px;display:flex;align-items:baseline;gap:10px;font-family:var(--f-body);font-weight:600;font-size:16px;line-height:1.3;color:var(--text)}
+.st-c h3 b{font-family:var(--f-head);font-weight:400;font-size:28px;line-height:1;color:var(--gold)}
+.st-c p{margin:0 0 14px;font-size:13.5px;line-height:1.55;color:var(--text-2)}
+.st-c p:last-child{margin-bottom:0}
+.st-a{display:inline-block;margin-top:auto;border:1px solid var(--line-2);border-radius:10px;padding:9px 12px;color:var(--gold);font-size:13px;text-decoration:none}
+.st-a:hover{background:var(--surface-2)}
+.st-a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.st-note{margin:16px 0 0;font-size:13px;line-height:1.5;color:var(--muted)}
+@media (max-width:1000px){.st{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.start{padding-block:30px 34px}.st{grid-template-columns:minmax(0,1fr);gap:10px}.st-c{padding:14px 16px 16px}}
+.recs{padding-block:44px 52px;border-bottom:1px solid var(--line)}
+.recs-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;margin-bottom:18px}
+.recs-head h2{margin:0;font-family:var(--f-head);font-weight:400;font-size:30px;line-height:1;letter-spacing:.02em;text-transform:uppercase}
+.recs-head .mono{color:var(--muted)}
+.rb{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
+.rc{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px 18px;min-width:0;display:flex;flex-direction:column}
+.rc h3{margin:0 0 14px;font-family:var(--f-mono);font-weight:500;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.rc-diary{grid-column:span 4;grid-row:span 2}
+.rc-goal,.rc-where{grid-column:span 2}
+.rc-cn,.rc-place{grid-column:span 3}
+.rc-big{margin:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.rc-big b{font-family:var(--f-head);font-weight:400;font-size:46px;line-height:1;font-variant-numeric:tabular-nums;color:var(--text)}
+.rc-big span{font-size:13.5px;color:var(--muted)}
+.rc-note{margin:14px 0 0;font-size:13px;line-height:1.5;color:var(--muted)}
+.rc .diary{max-height:396px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent;gap:6px;padding-right:2px}
+.rc .drow{grid-template-columns:minmax(112px,150px) minmax(0,1.4fr) repeat(3,minmax(0,.8fr));gap:12px;padding:10px 14px;border-radius:12px;background:var(--bg-1)}
+@media (min-width:981px){.rc-diary .dwrap{position:relative;flex:1 1 auto;min-height:260px}.rc-diary .dwrap .diary{position:absolute;inset:0;max-height:none;align-content:start}}
+.rc .drow:hover{background:var(--surface-2)}
+.rc .drow .dn{font-size:clamp(19px,2vw,25px)}
+.rc .drow .dv b{font-size:19px}
+.rc .drow.old .dd span{color:var(--gold)}
+.rc .drow.old .dn{color:var(--text-2)}
+.gbar{position:relative;height:30px;margin-top:16px;background:var(--bg-1);border:1px solid var(--line-2);border-radius:9px;overflow:hidden}
+.gbar i{position:absolute;inset:0 auto 0 0;width:0;background:repeating-linear-gradient(135deg,var(--red) 0 8px,#9e1f16 8px 16px);transition:width .6s}
+.gbar s{position:absolute;top:0;bottom:0;width:1px;background:rgba(239,239,241,.28)}
+.gticks{position:relative;height:16px;margin-top:6px;font-family:var(--f-mono);font-size:9.5px;color:var(--muted-2)}
+.gticks span{position:absolute;transform:translateX(-50%);font-variant-numeric:tabular-nums}
+.gticks span:last-child{transform:translateX(-100%)}
+.rc .rows{gap:9px}
+.rc .row{grid-template-columns:minmax(96px,118px) minmax(0,1fr) 3.5ch;gap:10px;font-size:13px}
+.rc .row .t{height:16px}
+.rc .row b{font-size:17px}
+.rc .row.newest .t i{background:var(--win)}
+.rc .row.newest span{color:var(--text)}
+.cn{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px}
+.cn li{display:grid;grid-template-columns:24px minmax(0,1fr) auto;align-items:center;gap:8px;font-size:13px;color:var(--text-2)}
+.cn canvas{width:24px;height:16px;display:block;border-radius:2px}
+.cn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cn b{font-family:var(--f-head);font-weight:400;font-size:16px;color:var(--text);font-variant-numeric:tabular-nums}
+.rc .split{display:grid;gap:12px}
+.rc .split>div{display:grid;grid-template-columns:40px minmax(56px,auto) minmax(0,1fr);column-gap:12px;align-items:center}
+.rc .split canvas{width:40px;height:40px;display:block;background:var(--bg-1);border:1px solid var(--line);border-radius:10px}
+.rc .split b{font-size:32px;text-align:right}
+.rc-none{margin:0;font-size:13px;color:var(--muted)}
+@media (max-width:980px){.rb{grid-template-columns:repeat(2,minmax(0,1fr))}.rc-diary{grid-column:1/-1;grid-row:auto}.rc-goal,.rc-where,.rc-cn,.rc-place{grid-column:span 1}}
+@media (max-width:640px){.rb{grid-template-columns:minmax(0,1fr);gap:10px}.rc-diary,.rc-goal,.rc-where,.rc-cn,.rc-place{grid-column:1/-1}
+  .rc .drow{grid-template-columns:minmax(0,1fr) repeat(2,minmax(0,auto));row-gap:6px}.rc .drow .dd{grid-column:1/2}.rc .drow .dn{grid-column:1/-1;order:-1}.rc .drow .dv3{display:none}
+  .rc .diary{max-height:340px}.recs-head h2{font-size:26px}}
+
+.foot{padding-block:30px calc(46px + env(safe-area-inset-bottom,0px));font-size:12.5px;line-height:1.65;color:var(--muted)}
+.foot p{margin:0}
+.foot strong,.foot li b{color:var(--text-2);font-weight:600}
+.foot details{margin-top:4px}
+.foot summary{display:inline-flex;align-items:center;gap:9px;padding:10px 16px 10px 0;cursor:pointer;list-style:none;color:var(--muted-2);-webkit-tap-highlight-color:transparent}
+.foot summary::-webkit-details-marker{display:none}
+.foot summary::after{content:"+";font-size:13px;letter-spacing:0;line-height:1}
+.foot details[open] summary::after{content:"\2212"}
+.foot summary:hover{color:var(--text-2)}
+.foot ul{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:7px;max-width:76ch}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+
+/* ---- 11-10 in between: the dashboard stays; three buttons in one row; roof colours as a slim line under the town ---- */
+.toolbar .tools{margin-left:0}
+.tools .btn svg{width:12px;height:12px;flex:none}
+.tools .btn[aria-pressed="true"]{background:var(--surface-2);border-color:var(--text)}
+.tools .sm{display:none}
+.tools .btn.snd{flex:none;width:40px;padding-left:0;padding-right:0;justify-content:center}.tools .btn.snd svg{width:15px;height:15px}
+.snd .s-on{display:none}.snd[aria-pressed="true"] .s-on{display:inline}.snd[aria-pressed="true"] .s-off{display:none}
+.share-pop{right:48px}
+/* the town radio, addition tr: the next button beside the speaker while the sound is on */
+.tools.snd-two .share-pop{right:96px}
+@media (max-width:620px){.tools.snd-two .btn:not(.snd) svg{display:none}}
+@media (min-width:561px) and (max-width:620px){.tools.snd-two .btn:not(.snd){padding-left:10px;padding-right:10px}}
+@media (max-width:560px){.tools #snd-go{order:2}.tools #snd-nx{order:1}}
+@media (max-width:560px){.tools .btn{white-space:nowrap}}
+.find{top:12px}
+.tour-go.mine-go{top:12px}
+#t-find:not([hidden]) ~ .mine-go{display:none}
+.pill{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:3;display:inline-flex;align-items:center;gap:12px;border:1px solid var(--line-2);border-radius:999px;
+  background:rgba(19,19,22,.92);color:var(--text);padding:9px 14px 9px 16px;font-family:var(--f-body);font-size:13px;cursor:pointer;white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.5);transition:border-color .2s}
+.pill:hover{border-color:var(--muted-2)}
+.pill b{font-family:var(--f-mono);font-weight:400;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.fit{position:absolute;right:12px;bottom:12px;z-index:3;width:38px;height:38px;display:grid;place-items:center;padding:0;border:1px solid var(--line-2);border-radius:11px;background:rgba(19,19,22,.86);color:var(--text-2);cursor:pointer;
+  transition:background-color .2s,border-color .2s,color .2s}
+.fit:hover{background:var(--surface-2);border-color:var(--muted-2);color:var(--text)}
+.fit svg{width:16px;height:16px}
+.view-stage.touring .pill,.view-stage.touring .fit,.view-stage.touring .hint{display:none}
+.legend-line{width:min(100%,1180px);margin-top:10px;display:flex;align-items:center;gap:4px 14px;flex-wrap:wrap}
+.legend-line > .mono{color:var(--muted);flex:none}
+.legend-line .legend-chips{position:static;gap:2px;pointer-events:auto;flex:1 1 auto}
+.legend-line .legend-chips .chip{border-color:transparent;background:none;padding:5px 9px}
+.legend-line .legend-chips .chip:hover{background:var(--surface)}
+.legend-line .legend-chips .chip[aria-pressed="true"]{background:var(--surface-2);border-color:var(--line-2)}
+@media (max-width:640px){.find{top:8px}.tour-go.mine-go{top:8px}.pill{bottom:10px;font-size:12.5px;padding:8px 12px 8px 14px}.fit{right:8px;bottom:8px}.legend-line .legend-chips .chip{padding:4px 7px}}
+@media (max-width:560px){.tools .lg{display:none}.tools .sm{display:inline}.tools .btn{gap:7px}}
+/* rows of "Where they are" are buttons: tap one to see only those houses */
+button.row{width:100%;border:0;background:none;font-family:inherit;text-align:left;cursor:pointer;padding:0;transition:opacity .2s}
+button.row:hover > span{color:var(--text)}
+button.row:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:4px}
+.rows.filtering button.row{opacity:.4}
+.rows.filtering button.row[aria-pressed="true"]{opacity:1}
+button.row[aria-pressed="true"] > span{color:var(--text);font-weight:600}
+/* the two corner buttons of the town: the whole town (left), full screen (in the corner, its icon turns inward while on).
+   In full screen the picture has no frame; filling the window (no real full screen) it is fixed over the whole window
+   (inset 0 of a fixed box: the visible window, also on phones with moving toolbars) and the page under it holds still.
+   The buttons, the pill, the tour box, the find box, the my-house button and the hint keep clear of notches and the home
+   bar there, and the inputs are big enough that a phone does not zoom in on them. On phones the two buttons step up over
+   the filter pill while it shows. An open card steps off them in full screen; in the normal view a button under an open
+   card steps aside until the card closes (the script below). On a zoomed-in phone page that fills the window the two
+   buttons follow what the visitor sees (the script below). In full screen a tour keeps the way out: the button moves to
+   the top corner. */
+#whole{right:58px}
+#t-full .fs-off{display:none}#t-full[aria-pressed="true"] .fs-on{display:none}#t-full[aria-pressed="true"] .fs-off{display:inline}
+.view-stage.full{border:0;border-radius:0}
+.view-stage.fill{position:fixed;inset:0;z-index:30;transform:none}
+html.town-fill,html.town-fill body{overflow:hidden;overscroll-behavior:none}
+html.town-fill .poster-in{z-index:59}
+html.town-snap{scroll-behavior:auto}
+.view-stage.full .fit{z-index:7;bottom:max(12px,env(safe-area-inset-bottom,0px))}
+.view-stage.full #t-full{right:max(12px,env(safe-area-inset-right,0px))}
+.view-stage.full #whole{right:calc(max(12px,env(safe-area-inset-right,0px)) + 46px)}
+.view-stage.full .pill,.view-stage.full .tour{bottom:max(14px,env(safe-area-inset-bottom,0px))}
+.view-stage.full.touring #t-full{display:grid;top:max(12px,env(safe-area-inset-top,0px));bottom:auto}
+.view-stage:not(.full) .fit.under{visibility:hidden}
+.view-stage.fill .fit{transform-origin:0 0}
+.view-stage.full .find{left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));top:max(12px,env(safe-area-inset-top,0px));width:auto;max-width:380px}
+.view-stage.full .tour-go{left:max(12px,env(safe-area-inset-left,0px));top:max(12px,env(safe-area-inset-top,0px))}
+.view-stage.full .hint{right:max(14px,env(safe-area-inset-right,0px));top:max(12px,env(safe-area-inset-top,0px))}
+@media (pointer:coarse){.view-stage.full .find-row input,.view-stage.full .mine-row input{font-size:16px}}
+@media (max-width:640px){#whole{right:54px}#t-filter:not([hidden]) ~ .fit{bottom:54px}
+  .view-stage.full .find{left:max(8px,env(safe-area-inset-left,0px));right:max(8px,env(safe-area-inset-right,0px));top:max(8px,env(safe-area-inset-top,0px));max-width:none}
+  .view-stage.full .tour-go{left:max(8px,env(safe-area-inset-left,0px));top:max(8px,env(safe-area-inset-top,0px))}
+  .view-stage.full .fit{bottom:max(8px,env(safe-area-inset-bottom,0px))}.view-stage.full #t-full{right:max(8px,env(safe-area-inset-right,0px))}
+  .view-stage.full #whole{right:calc(max(8px,env(safe-area-inset-right,0px)) + 46px)}
+  .view-stage.full .pill{bottom:max(10px,env(safe-area-inset-bottom,0px))}.view-stage.full .tour{bottom:max(8px,env(safe-area-inset-bottom,0px))}
+  .view-stage.full #t-filter:not([hidden]) ~ .fit{bottom:calc(max(10px,env(safe-area-inset-bottom,0px)) + 44px)}
+  .view-stage.full.touring #t-full{top:max(8px,env(safe-area-inset-top,0px))}}
+</style>
+
+<header class="poster" aria-label="6529 Town">
+  <div class="frame" aria-hidden="true"></div>
+  <div class="poster-in">
+    <div class="titlebar">
+      <div class="tl">
+        <h1 class="headline">6529 Town</h1>
+        <p class="home-l mono">Official site: <a id="home-a" href="https://6529.io/" target="_blank" rel="noopener">6529.io ↗</a></p>
+        <p class="home-l home-s mono">New here? <a id="start-a" href="#get-a-house">Get a house ↓</a></p>
+      </div>
+      <div class="days" role="group" aria-label="Days: one building per day, as tall as that day's town">
+        <button class="play" id="play" aria-label="Watch the town grow"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 1.5v13l11-6.5z" fill="currentColor"/></svg></button>
+        <div class="strip sky" id="strip"></div>
+        <div class="sky-cap"><b id="sky-day">—</b><span id="sky-sub">—</span></div>
+      </div>
+    </div>
+    <div class="toolbar">
+      <div class="tools">
+        <button class="btn solid" id="t-tour-go" aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 1.5v13l11-6.5z" fill="currentColor"/></svg><span class="lg">Take the tour</span><span class="sm">Tour</span></button>
+        <button class="btn" id="t-find-go"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 10l4.5 4.5" stroke="currentColor" stroke-width="2"/></svg><span class="lg">Find your house</span><span class="sm">My house</span></button>
+        <button class="btn" id="share" aria-haspopup="true">Share</button>
+        <div class="share-pop" id="share-pop" hidden>
+          <button class="btn" id="share-card">Postcard</button>
+          <a class="btn" id="share-x" target="_blank" rel="noopener">Post on X</a>
+          <button class="btn" id="share-copy">Copy link</button>
+        </div>
+        <button class="btn snd" id="snd-go" aria-pressed="false" aria-label="Sound" title="Sound"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6h2.6L8 3v10L4.6 10H2z" fill="currentColor"/><path class="s-on" d="M10.4 5.6a3.4 3.4 0 0 1 0 4.8M12.2 3.8a6 6 0 0 1 0 8.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path class="s-off" d="M10.6 6l3.4 4M14 6l-3.4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+        <button class="btn snd" id="snd-nx" hidden aria-label="Next song" title="Next song"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3.2v9.6L10.4 8z" fill="currentColor"/><path d="M12.7 3.6v8.8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+      </div>
+    </div>
+    <div class="viewport">
+      <div class="view-stage view" id="t-stage">
+        <canvas id="t-canvas" aria-label="An imaginary town with one house for each validator" role="img"></canvas>
+        <div class="lab" id="t-lab-ministry"><span class="tag"><b>Ministry of Validation</b><small id="t-lab-ministry-sub"></small></span><span class="stem"></span></div>
+        <div class="lab" id="t-lab-site"><span class="tag">Building site<small id="t-lab-site-n"></small></span><span class="stem"></span></div>
+        <div class="lab" id="t-lab-stage"><span class="tag">Main Stage<small id="t-stage-s">top 3 right now</small></span><span class="stem"></span></div>
+        <div class="card" id="t-card" role="dialog" aria-live="polite"><button class="x" id="t-card-x" aria-label="Close">×</button><div id="t-card-body"></div></div>
+        <div class="tip" id="t-tip" aria-hidden="true"></div>
+        <div class="find" id="t-find" hidden>
+          <label class="mono" for="t-find-in">Paste the wallet that runs your validator</label>
+          <div class="find-row"><input id="t-find-in" type="text" placeholder="0x…" autocomplete="off" spellcheck="false" inputmode="text"><button class="btn solid" id="t-find-btn">Find</button></div>
+          <p class="find-msg" id="t-find-msg">Your address stays in your browser.</p>
+          <button class="x" id="t-find-x" aria-label="Close">×</button>
+        </div>
+        <button class="tour-go mine-go" id="t-mine-go" hidden><span aria-hidden="true">★</span><b id="t-mine-name-b">My house</b></button>
+        <div class="lab" id="t-lab-mine"><span class="tag">★ <span id="t-lab-mine-name">My house</span><small>yours, in this browser</small></span><span class="stem"></span></div>
+        <div class="banner" id="t-banner" hidden aria-live="polite"><b></b><span></span></div>
+        <div class="tour" id="t-tour" role="dialog" aria-live="polite" aria-label="Guided tour" hidden>
+          <span class="mono" id="t-tour-n"></span>
+          <h3 id="t-tour-h"></h3>
+          <p id="t-tour-p"></p>
+          <a class="tour-a" id="t-tour-a" target="_blank" rel="noopener" href="https://6529.io/validator" hidden>Want a house? Run a validator →</a>
+          <div class="tour-nav">
+            <button class="btn" id="t-tour-prev">Back</button>
+            <span class="dots" id="t-tour-dots" aria-hidden="true"></span>
+            <button class="btn solid" id="t-tour-next">Next</button>
+          </div>
+          <button class="x" id="t-tour-x" aria-label="End the tour">×</button>
+        </div>
+        <button class="pill" id="t-filter" hidden><span id="t-filter-t"></span><b>Show all ×</b></button>
+        <button class="fit" id="whole" aria-label="Show the whole town" title="Whole town"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.8 8.2L8 2.8l6.2 5.4M3.6 6.8v6.9h8.8V6.8M6.8 13.7v-3.5h2.4v3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></button>
+        <button class="fit" id="t-full" aria-pressed="false" aria-label="Full screen" title="Full screen"><svg viewBox="0 0 16 16" aria-hidden="true"><path class="fs-on" d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4" fill="none" stroke="currentColor" stroke-width="1.6"/><path class="fs-off" d="M6 2v4H2M10 2v4h4M14 10h-4v4M2 10h4v4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+        <span class="mono hint" id="t-hint">Drag to turn · zoom · tap a house</span>
+      </div>
+    </div>
+    <div class="notice" id="stats" aria-live="polite">
+      <div class="nt-band"><span id="s-res-k"></span><span id="s-state"></span></div>
+      <div class="nt-body">
+        <button class="nt-res" type="button" data-key="ministry" aria-pressed="false"><b id="s-name">—</b><span class="nt-k">the day's result</span></button>
+        <div class="nt-agree">
+          <div class="nt-pct"><b id="s-signed">—</b><span id="s-signed-l">—</span></div>
+          <div class="nt-meter" id="s-meter" aria-hidden="true"><i id="s-fill"></i><u></u></div>
+        </div>
+        <div class="nt-facts">
+          <button type="button" data-key="lit" aria-pressed="false"><canvas data-icon="lit" width="68" height="68" aria-hidden="true"></canvas><b id="s-pop">—</b><small id="s-pop-l">validators</small></button>
+          <button type="button" data-key="signed" aria-pressed="false"><canvas data-icon="signed" width="68" height="68" aria-hidden="true"></canvas><b id="s-sig">—</b><small id="s-sig-l">signed</small></button>
+          <button type="button" data-key="site" aria-pressed="false"><canvas data-icon="site" width="68" height="68" aria-hidden="true"></canvas><b id="s-new">—</b><small id="s-new-l">registered for tomorrow</small></button>
+        </div>
+      </div>
+      <div class="nt-foot" id="s-foot"><div class="nt-tdh" id="s-tdh"><span class="nt-tdh-a"><b id="s-tdh-n"></b> TDH in town</span><span class="nt-tdh-s" id="s-share"><i class="nt-ring" id="s-share-r" aria-hidden="true"></i><b id="s-share-n"></b> of all TDH</span></div><span class="nt-when"><span id="s-name-l"></span><span id="s-read"></span><button type="button" id="s-fresh" hidden>New numbers are in · refresh</button></span></div>
+    </div>
+    <div class="legend-line">
+      <span class="mono">Roof colour = continent</span>
+      <div class="legend-chips" id="t-legend" aria-label="Roof colours: tap one to show only those houses"></div>
+    </div>
+    <div class="key" id="key">
+      <p class="key-note" id="key-note" aria-live="polite"></p>
+      <p class="key-lede"><b>One house = one validator</b>: a computer, in someone's home or office, that checks everyone's TDH once a day and signs the result.</p>
+    </div>
+    <div class="p-foot">
+      <span class="mono">Tap a colour to see only those houses</span>
+      <a class="mono" href="#town-numbers">The numbers ↓</a>
+    </div>
+  </div>
+</header>
+
+<section class="start" id="get-a-house" aria-labelledby="s-start">
+  <div class="wrap">
+    <div class="recs-head"><h2 id="s-start">Get a house</h2><span class="mono">How to become a validator</span></div>
+    <ol class="st">
+      <li class="st-c"><h3><b aria-hidden="true">1</b>Hold a Meme card</h3><p>You need at least one card from The Memes by 6529. Your cards give you TDH, and TDH is what a validator signs for.</p><a class="st-a" href="https://opensea.io/collection/thememes6529" target="_blank" rel="noopener">The Memes on OpenSea ↗</a></li>
+      <li class="st-c"><h3><b aria-hidden="true">2</b>Download the validator</h3><p>Only from 6529.io/validator. It runs on Windows, Mac and Linux.</p><a class="st-a" href="https://6529.io/validator" target="_blank" rel="noopener">Get the validator ↗</a></li>
+      <li class="st-c"><h3><b aria-hidden="true">3</b>Install it and sign once</h3><p>The app makes a key for your computer and asks your wallet to sign one message. It costs no gas and moves nothing.</p></li>
+      <li class="st-c"><h3><b aria-hidden="true">4</b>Keep the computer on</h3><p>The validator signs once a day by itself. Your first signature is the next day, and then your house stands in the town.</p></li>
+    </ol>
+    <p class="st-note">Never share your seed phrase. Always check what you sign with your wallet.</p>
+  </div>
+</section>
+
+<main id="town-numbers">
+  <div class="wrap">
+
+    <section class="recs" aria-labelledby="s-recs">
+      <div class="recs-head"><h2 id="s-recs">Town records</h2><span class="mono" id="recs-day">—</span></div>
+      <div class="rb">
+        <article class="rc rc-diary" aria-label="Diary">
+          <h3>Diary</h3>
+          <div class="dwrap"><div class="diary" id="diary"></div></div>
+          <p class="rc-note">Tap a day to see the town that day.</p>
+        </article>
+        <article class="rc rc-goal">
+          <h3>Toward a thousand</h3>
+          <p class="rc-big"><b id="g-now">—</b><span>of 1,000 houses</span></p>
+          <div class="gbar" aria-hidden="true"><i id="g-fill"></i><s style="left:10%"></s><s style="left:25%"></s><s style="left:50%"></s><s style="left:75%"></s></div>
+          <div class="gticks" aria-hidden="true"><span style="left:10%">100</span><span style="left:25%">250</span><span style="left:50%">500</span><span style="left:75%">750</span><span style="left:100%">1,000</span></div>
+          <p class="rc-note" id="g-next">—</p>
+        </article>
+        <article class="rc rc-where">
+          <h3>Where they are</h3>
+          <div class="rows" id="rows"></div>
+          <p class="rc-note">Tap a row to see only those houses.</p>
+          <p class="rc-note" id="where-note"></p>
+        </article>
+        <article class="rc rc-cn">
+          <h3>Countries named</h3>
+          <p class="rc-big"><b id="cn-n">—</b><span id="cn-l">validators name a country</span></p>
+          <ul class="cn" id="cn-list"></ul>
+        </article>
+        <article class="rc rc-place">
+          <h3>Kind of place</h3>
+          <div class="split" id="split"></div>
+        </article>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <p><strong>Unofficial community project, not made by 6529.</strong> Numbers update every 2 hours.</p>
+      <details>
+        <summary class="mono">How it works</summary>
+        <ul>
+          <li><b>Numbers.</b> Read from one validator's own Network page every 2 hours. A day is final at <span id="f-final">19:30 UTC</span>. Per house the page keeps a few facts (first day, part of the world, data center, took part, signed) and, for “Find your house”, a scrambled wallet code with that wallet's TDH, which only shows when someone enters that wallet's address. No wallets, no names.</li>
+          <li><b>Houses.</b> One per validator. Each continent has its own quarter; the lot inside it is made up. Roof colour shows the continent reported that day. Data centers stand apart, beyond the factory. Places are what each validator chose to publish. A garden tree grows a little every day for its first weeks, and a lantern marks the houses here since the first day of house records.</li>
+          <li><b>Planes and lights.</b> Paper planes fly between houses that took part that day. Gold lights run from houses that signed to the Ministry of Validation. Both are for show, not one per real message.</li>
+          <li><b>Sound.</b> Off until you tap the speaker. Eight quiet songs: the town's own tune, then free music (CC0) by cynicmusic, Destin715, KarateStudios, HoliznaCC0 and Tsorthan Grove. On a computer, a soft chime is a gold light being counted.</li>
+          <li><b>First days.</b> Wed 4 to Sat 7 Nov ran on the network's old chain, which kept only each day's totals, so the houses on those days stand in for the real ones.</li>
+          <li><b>Relays.</b> From punk6529's announcement.</li>
+          <li><b>Art.</b> The frog and the citizen are original characters. Meme Cards are CC0; tap the Meme Museum in town to see the card on show and its artist.</li>
+        </ul>
+      </details>
+    </footer>
+  </div>
+</main>
+
+<div class="pc" id="pc" hidden role="dialog" aria-modal="true" aria-label="Postcard from 6529 Town">
+  <div class="pc-box">
+    <img id="pc-img" alt="Postcard from 6529 Town">
+    <div class="pc-row">
+      <div class="pc-pick" id="pc-pick" hidden><button data-k="town" aria-pressed="true">Town</button><button data-k="house" aria-pressed="false">My house</button></div>
+      <a class="btn solid" id="pc-save" download="6529-town-postcard.png">Save postcard</a>
+      <button class="btn" id="pc-copy" hidden>Copy postcard</button>
+      <a class="btn" id="pc-post" target="_blank" rel="noopener" hidden>Share on X</a>
+      <button class="btn" id="pc-share" hidden>Share</button>
+      <button class="btn" id="pc-x">Close</button>
+    </div>
+    <p class="pc-tip mono" id="pc-tip">Or press and hold the postcard to save it</p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+  "use strict";
+  var DATA = /*__DATA__*/null;
+  var DAYS = DATA.days, CARDS = DATA.cards, RELAYS = DATA.relays;
+  var CONT = [["north_america", "North America"], ["europe", "Europe"], ["asia", "Asia"], ["south_america", "South America"], ["oceania", "Oceania"], ["africa", "Africa"]];
+  var CNAME = {}; CONT.forEach(function (c) { CNAME[c[0]] = c[1]; });
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var $ = function (id) { return document.getElementById(id); };
+  function fmt(n) { return n == null ? "—" : Number(n).toLocaleString("en-US"); }
+  function nOf(n, w) { return fmt(n) + " " + w + (n === 1 ? "" : "s"); }
+  // the network counts Sun 8 Nov as day one ("Network began"); the days before it ran on the old chain
+  var FIRSTDAY = 0; while (FIRSTDAY < DATA.days.length - 1 && DATA.days[FIRSTDAY].old_chain) FIRSTDAY++;
+  function dayName(i) { return DATA.days[i].old_chain ? "old chain" : i === FIRSTDAY ? "day one" : "day " + (i - FIRSTDAY + 1); }
+  function tdh(n) { return n >= 1e9 ? (n / 1e9).toFixed(1) + "B" : (n / 1e6).toFixed(1) + "M"; }
+  var INK = "#0a0a0a", CREAM = "#efe5cf", WIN = "#ffcf6b", OFF = "#2a2a30", RED = "#c8291e";
+
+  /* ---------------- drawings (paper cut-outs) ---------------- */
+  function pen(x) {
+    x.lineJoin = "round"; x.lineCap = "round"; x.strokeStyle = INK; x.lineWidth = 3;
+    return {
+      poly: function (pts, fill) { x.beginPath(); pts.forEach(function (p, i) { i ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1]); }); x.closePath(); x.fillStyle = fill; x.fill(); x.stroke(); },
+      rect: function (a, b, w, h, fill) { x.fillStyle = fill; x.fillRect(a, b, w, h); x.strokeRect(a, b, w, h); },
+      circ: function (a, b, r, fill) { x.beginPath(); x.arc(a, b, r, 0, 7); x.fillStyle = fill; x.fill(); x.stroke(); }
+    };
+  }
+  var ROOF = [RED, "#3a3a42", "#2f7f86", RED, "#8f1911", "#3a3a42"];
+  function drawHouse(x, v, win, curtain) { // 6 kinds of house in a 64px cell, standing on the bottom edge
+    var P = pen(x), body = CREAM;
+    function windowAt(a, b, w, h) {
+      P.rect(a, b, w, h, win); x.save(); x.lineWidth = 1.6; x.beginPath();
+      if (curtain) { x.moveTo(a + w / 2, b + 1); x.lineTo(a + w / 2, b + h - 1); x.moveTo(a + 1, b + 2.5); x.lineTo(a + w - 1, b + 2.5); }
+      else { x.moveTo(a + w / 2, b); x.lineTo(a + w / 2, b + h); x.moveTo(a, b + h / 2); x.lineTo(a + w, b + h / 2); }
+      x.stroke(); x.restore();
+    }
+    var r = ROOF[v];
+    if (v === 0) { P.rect(14, 33, 36, 28, body); P.poly([[9, 35], [32, 12], [55, 35]], r); windowAt(19, 40, 12, 11); P.rect(36, 45, 9, 16, "#3a3a42"); }
+    else if (v === 1) { P.rect(19, 15, 26, 46, body); P.rect(16, 9, 32, 7, r); windowAt(25, 21, 14, 10); windowAt(25, 36, 14, 10); P.rect(28, 50, 8, 11, "#3a3a42"); }
+    else if (v === 2) { P.rect(41, 15, 7, 16, "#3a3a42"); P.rect(9, 37, 46, 24, body); P.poly([[5, 39], [17, 23], [47, 23], [59, 39]], r); windowAt(15, 43, 11, 10); windowAt(38, 43, 11, 10); }
+    else if (v === 3) { P.rect(22, 27, 20, 34, body); P.poly([[18, 29], [32, 5], [46, 29]], r); P.circ(32, 40, 6, win); P.rect(28, 50, 8, 11, "#3a3a42"); }
+    else if (v === 4) {
+      P.rect(10, 31, 44, 30, body); P.rect(16, 18, 32, 11, INK);
+      x.fillStyle = CREAM; x.font = "bold 9px 'Martian Mono', monospace"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("GM", 32, 24);
+      for (var k = 0; k < 6; k++) { x.fillStyle = k % 2 ? CREAM : RED; x.fillRect(8 + k * 8, 30, 8, 7); } x.strokeRect(8, 30, 48, 7);
+      windowAt(16, 42, 32, 12);
+    } else {
+      P.rect(44, 9, 7, 26, RED); x.fillStyle = CREAM; x.fillRect(45.5, 15, 4, 4);
+      P.rect(8, 35, 48, 26, body); P.poly([[8, 35], [8, 25], [24, 35], [24, 25], [40, 35], [40, 25], [56, 35]], r);
+      windowAt(13, 44, 9, 9); windowAt(27, 44, 9, 9); windowAt(41, 44, 9, 9);
+    }
+  }
+  function drawMinistry(x, W) {
+    var s = W / 256; x.save(); x.scale(s, s); var P = pen(x);
+    x.lineWidth = 3; x.beginPath(); x.moveTo(128, 34); x.lineTo(128, 6); x.stroke();
+    P.rect(130, 6, 28, 19, RED); x.fillStyle = CREAM; x.fillRect(141, 9, 6, 13); x.fillRect(137.5, 12.5, 13, 6);
+    P.rect(98, 62, 60, 20, CREAM); x.beginPath(); x.arc(128, 62, 32, Math.PI, 0); x.closePath(); x.fillStyle = RED; x.fill(); x.stroke();
+    P.rect(122, 28, 12, 6, CREAM);
+    P.rect(44, 128, 168, 82, "#d6cbb2");
+    P.poly([[30, 120], [128, 74], [226, 120]], RED); P.circ(128, 104, 8, WIN);
+    P.rect(34, 118, 188, 14, CREAM);
+    for (var k = 0; k < 6; k++) P.rect(50 + k * 29, 134, 14, 76, CREAM);
+    P.rect(36, 210, 184, 12, CREAM); P.rect(24, 222, 208, 14, "#d6cbb2"); P.rect(14, 236, 228, 16, CREAM);
+    x.restore();
+  }
+  function drawFrog(x) { // 128 x 128, the town's own pond frog
+    var P = pen(x);
+    x.beginPath(); x.ellipse(56, 108, 50, 15, 0, 0, 7); x.fillStyle = "#2f7f86"; x.fill(); x.stroke();
+    x.beginPath(); x.ellipse(50, 106, 30, 7, 0, 0, 7); x.fillStyle = "#3f97a0"; x.fill();
+    x.beginPath(); x.ellipse(30, 109, 12, 5, 0, 0.5, 6.0); x.lineTo(30, 109); x.closePath(); x.fillStyle = "#6cae48"; x.fill(); x.stroke();
+    x.beginPath(); x.ellipse(108, 104, 14, 8, -0.3, 0, 7); x.fillStyle = "#5c9a3a"; x.fill(); x.stroke();
+    x.beginPath(); x.ellipse(92, 92, 22, 19, 0, 0, 7); x.fillStyle = "#6cae48"; x.fill(); x.stroke();
+    x.beginPath(); x.ellipse(90, 99, 13, 10, 0, 0, 7); x.fillStyle = "#e9e2b8"; x.fill();
+    P.circ(81, 72, 9, "#fbf6e8"); P.circ(101, 72, 9, "#fbf6e8");
+    x.fillStyle = INK; x.beginPath(); x.arc(83, 73, 3.6, 0, 7); x.arc(103, 73, 3.6, 0, 7); x.fill();
+    x.beginPath(); x.arc(91, 84, 8, 0.25, Math.PI - 0.25); x.stroke();
+    x.fillStyle = "#e8737a"; x.beginPath(); x.arc(76, 86, 3, 0, 7); x.arc(106, 86, 3, 0, 7); x.fill();
+    x.fillStyle = "#6cae48"; x.beginPath(); x.ellipse(80, 109, 7, 4, 0, 0, 7); x.fill(); x.stroke();
+    x.beginPath(); x.ellipse(101, 110, 7, 4, 0, 0, 7); x.fill(); x.stroke();
+  }
+  function citizenAtlas() { // 4 walking frames, 16 x 16 pixel figure scaled x4
+    var c = document.createElement("canvas"); c.width = 256; c.height = 64; var x = c.getContext("2d");
+    var base = ["......RRRR......", ".....RRRRRR.....", ".....KKKKKK.....", ".....SSSSSS.....", ".....SKSSKS.....", ".....SSSSSS.....",
+                ".....SSSSSS.....", "....RRRRRRRR....", "...SRRCCRRRRS...", "...SRRCCRRRRS...", "...SRRRRRRRRS...", "....RRRRRRRR...."];
+    var legs = [["....KK....KK....", "....KK....KK....", "....KK....KK....", "...KKK....KKK..."],
+                ["....KK...KK.....", "....KK...KK.....", "...KK.....KK....", "..KKK.....KKK..."],
+                [".....KK.KK......", ".....KK.KK......", ".....KK.KK......", "....KKK.KKK....."],
+                [".....KK...KK....", ".....KK...KK....", "....KK.....KK...", "...KKK.....KKK.."]];
+    var col = { R: RED, K: "#17110e", S: "#d9a07a", C: CREAM };
+    for (var f = 0; f < 4; f++) base.concat(legs[f]).forEach(function (row, y) {
+      for (var i = 0; i < 16; i++) { var ch = row[i]; if (col[ch]) { x.fillStyle = col[ch]; x.fillRect(f * 64 + i * 4, y * 4, 4, 4); } }
+    });
+    return c;
+  }
+  function posterDraw(text, bg, fg) {
+    return function (x, W, H) {
+      x.strokeStyle = INK; x.lineWidth = 6; x.beginPath(); x.moveTo(W * 0.3, H * 0.74); x.lineTo(W * 0.3, H - 3); x.moveTo(W * 0.7, H * 0.74); x.lineTo(W * 0.7, H - 3); x.stroke();
+      var bx = W * 0.05, by = H * 0.3, bw = W * 0.9, bh = H * 0.44;
+      x.fillStyle = bg; x.fillRect(bx, by, bw, bh);
+      if (bg === RED) { x.save(); x.beginPath(); x.rect(bx, by, bw, bh); x.clip(); for (var k = 0; k < 24; k++) { x.beginPath(); x.moveTo(W / 2, by + bh * 1.2); x.arc(W / 2, by + bh * 1.2, W, Math.PI + k * Math.PI / 24, Math.PI + (k + 0.5) * Math.PI / 24); x.closePath(); x.fillStyle = "#b02317"; x.fill(); } x.restore(); }
+      x.lineWidth = 7; x.strokeStyle = INK; x.strokeRect(bx, by, bw, bh);
+      x.lineWidth = 2.5; x.strokeStyle = fg; x.strokeRect(bx + 9, by + 9, bw - 18, bh - 18);
+      x.fillStyle = fg; x.textAlign = "center"; x.textBaseline = "middle";
+      var lines = text.split("\n"), size = bh * 0.72 / lines.length;
+      x.font = "900 " + size + "px 'Big Shoulders Stencil Display', Anton, Impact, sans-serif";
+      var mw = Math.max.apply(null, lines.map(function (l) { return x.measureText(l).width; }));
+      if (mw > bw * 0.84) { size *= bw * 0.84 / mw; x.font = "900 " + size + "px 'Big Shoulders Stencil Display', Anton, Impact, sans-serif"; }
+      lines.forEach(function (l, k) { x.fillText(l, W / 2, by + bh / 2 + (k - (lines.length - 1) / 2) * size * 0.95 + size * 0.04); });
+    };
+  }
+  function cardDraw(img, ar) {
+    return function (x, W, H) {
+      x.strokeStyle = INK; x.lineWidth = 6; x.beginPath(); x.moveTo(W * 0.5, H * 0.8); x.lineTo(W * 0.5, H - 3); x.moveTo(W * 0.36, H - 3); x.lineTo(W * 0.64, H - 3); x.stroke();
+      var bh = H * 0.74, bw = bh * ar; if (bw > W * 0.86) { bw = W * 0.86; bh = bw / ar; }
+      var bx = (W - bw) / 2, by = H * 0.8 - bh;
+      x.fillStyle = INK; x.fillRect(bx - 8, by - 8, bw + 16, bh + 16);
+      x.fillStyle = CREAM; x.fillRect(bx - 3, by - 3, bw + 6, bh + 6);
+      if (img.complete && img.naturalWidth) x.drawImage(img, bx, by, bw, bh); else { x.fillStyle = "#1c1c21"; x.fillRect(bx, by, bw, bh); }
+    };
+  }
+
+  /* ---------------- sections ---------------- */
+  var PAL = ["#c8291e", "#efeff1", "#e8d48a", "#2f7f86", "#cd7f32", "#8f5cff", "#848490"];
+  function renderNumbers(i) {
+    countStop();
+    var d = DAYS[i], inprog = !d.final, pct = d.signed_pct, unk = d.old_chain && d.keys === "unknown", sv = d.signed_validators != null;
+    var share0 = d.counted_tdh && d.all_tdh ? Math.round(100 * d.counted_tdh / d.all_tdh) : null, newc = nextNew(d);
+    $("s-res-k").textContent = d.label;
+    var stt = $("s-state"); stt.textContent = d.old_chain ? "Old chain" : inprog ? "In progress" : "Final"; stt.className = inprog ? "live" : "";
+    $("s-name").textContent = d.name || "Not recorded";
+    $("s-signed").textContent = pct != null ? pct + "%" : ""; $("s-signed").hidden = pct == null; $("s-meter").hidden = pct == null;
+    $("s-fill").style.width = Math.max(0, Math.min(100, pct || 0)) + "%";
+    $("s-signed-l").textContent = pct == null ? "The old chain kept only the day's totals." : d.old_chain ? "of the counted TDH signed · old chain" :
+      "of the town's TDH signed · needs two thirds" + (pct >= 66.667 ? " ✓" : inprog ? ", not there yet" : ", not reached");
+    $("s-pop").textContent = unk ? "—" : fmt(d.validators);
+    $("s-pop-l").textContent = unk ? "validators not recorded" : d.validators === 1 ? "validator" : "validators";
+    $("s-sig").textContent = sv ? fmt(d.signed_validators) : d.signed_accounts != null ? fmt(d.signed_accounts) : "—";
+    $("s-sig-l").textContent = sv ? (inprog ? "signed so far" : "signed") : d.signed_accounts != null ? (d.signed_accounts === 1 ? "account signed" : "accounts signed") : "not recorded";
+    $("s-new").textContent = newc != null ? "+" + fmt(newc) : "—";
+    $("s-new-l").textContent = newc != null ? (i === DAYS.length - 1 ? "registered for tomorrow" : "moved in the next day") : "not recorded";
+    setSigning(d);
+    $("s-tdh").hidden = !d.counted_tdh; $("s-tdh-n").textContent = d.counted_tdh ? tdh(d.counted_tdh) : "";
+    $("s-share").hidden = share0 == null; $("s-share-n").textContent = share0 != null ? share0 + "%" : ""; $("s-share-r").style.setProperty("--p", share0 || 0);
+    setRead(i);
+    $("s-foot").hidden = !$("s-name-l").textContent && !$("s-read").textContent && $("s-fresh").hidden && !d.counted_tdh;
+    [].forEach.call($("diary").children, function (r) { r.setAttribute("aria-current", +r.dataset.i === i ? "true" : "false"); });
+    renderRecords(i);
+    var msub = (d.name ? "“" + d.name + "” · " : "") + (d.signed_pct != null ? d.signed_pct + "% signed" : d.label);
+    $("t-lab-ministry-sub").textContent = msub;
+  }
+  var PARTIES = [100, 250, 500, 750, 1000, 1500, 2000];
+  var PLACE_TOTAL_ONLY = ["2026-11-08"]; // days whose "place not shown" split can't be proven: the where-note gives only the total
+  function renderRecords(i) { // the board under the town, for the day picked on the skyline
+    var d = DAYS[i], old = !!d.old_chain, stt = ((DATA.homes && DATA.homes.stats) || [])[i] || null;
+    $("recs-day").textContent = d.label + (old ? " · old chain" : d.final ? " · final" : " · in progress");
+    var v = d.validators || 0, next = PARTIES.filter(function (m) { return m > v; })[0];
+    $("g-now").textContent = fmt(v); $("g-fill").style.width = Math.min(100, v / 10) + "%";
+    $("g-next").textContent = next ? fmt(next - v) + " more to the " + fmt(next) + "-house party" : "Past every party so far";
+    var cs = d.continents || {}, rows = $("rows"); rows.innerHTML = "";
+    var list = CONT.map(function (c) { return [c[0], c[1], cs[c[0]] || 0]; }).filter(function (r) { return r[2] > 0; }).sort(function (a, b) { return b[2] - a[2]; });
+    if (cs.not_reported) list.push(["not_reported", "Place not shown", cs.not_reported]);
+    var mx = Math.max.apply(null, list.map(function (r) { return r[2]; }).concat([1]));
+    list.forEach(function (r) {
+      var el = document.createElement("button"); el.type = "button"; el.dataset.k = r[0]; el.className = "row" + (r[0] === "not_reported" ? " priv" : "");
+      el.innerHTML = "<span></span><div class='t'><i></i></div><b></b>";
+      el.addEventListener("click", function () {
+        if (!townView) return;
+        chipFilter = chipFilter === r[0] ? null : r[0]; townView.setFilter(chipFilter);
+        if (chipFilter) $("t-stage").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+      });
+      el.children[0].textContent = r[1]; el.children[2].textContent = r[2];
+      var bar = el.querySelector("i"); bar.style.width = (100 * r[2] / mx) + "%"; if (r[0] !== "not_reported" && typeof CCOL !== "undefined") bar.style.background = CCOL[r[0]];
+      rows.appendChild(el);
+    });
+    syncFilterUI();
+    var wn = old ? "The old chain didn't keep places." : PLACE_TOTAL_ONLY.indexOf(d.date) >= 0 && cs.not_reported ? "Place not shown: " + nOf(cs.not_reported, "house") + "." : "";
+    if (!wn && stt && cs.not_reported && stt.noplace + stt.noreport === cs.not_reported)
+      wn = "Place not shown: " + stt.noplace + " report without a place" + (stt.noreport ? ", " + stt.noreport + (d.final ? " had sent no report." : " haven't sent a report yet.") : ".");
+    $("where-note").textContent = wn;
+    var cn = d.countries || [], cl = $("cn-list"), ncn = cn.reduce(function (a, c) { return a + c[1]; }, 0); cl.innerHTML = "";
+    $("cn-n").textContent = old ? "" : fmt(ncn);
+    $("cn-l").textContent = old ? "Not kept on the old chain." : ncn === 1 ? "validator names a country" : "validators name a country";
+    cn.forEach(function (c) {
+      var li = document.createElement("li"), cv = document.createElement("canvas"); cv.width = 48; cv.height = 32;
+      try { flagDraw(cv.getContext("2d"), 48, 32, c[0]); } catch (e) {}
+      var sp = document.createElement("span"), nb = document.createElement("b"); sp.textContent = c[0]; nb.textContent = c[1];
+      li.appendChild(cv); li.appendChild(sp); li.appendChild(nb); cl.appendChild(li);
+    });
+    var pl = d.places || {}, sp2 = $("split"); sp2.innerHTML = "";
+    if (old) sp2.innerHTML = "<p class='rc-none'>Not kept on the old chain.</p>";
+    else { [["lit", "home or office", pl.home], ["dc", "data center", pl.data_center], ["private", "not reported", pl.not_reported]].forEach(function (p) {
+      if (p[2] == null) return;
+      var el = document.createElement("div"); el.innerHTML = "<canvas width='68' height='68' aria-hidden='true'></canvas><b></b><span></span>";
+      el.firstChild.dataset.icon = p[0]; el.children[1].textContent = fmt(p[2]); el.children[2].textContent = p[1]; sp2.appendChild(el);
+    }); try { renderLegend(sp2); } catch (e) {} }
+  }
+  /* how old the numbers are. READ = the newest reading of the validator's page in this copy of the site (the build
+     writes each day's "captured" stamp, UTC). Shown in the visitor's own clock; a reading older than 7 hours (two
+     missed 3-hour runs) is said out loud on every day, because then the whole town is behind. */
+  function stampMs(s) { var q = /^(\d{4})(\d\d)(\d\d)T(\d\d)(\d\d)Z$/.exec(s || ""); return q ? Date.UTC(+q[1], q[2] - 1, +q[3], +q[4], +q[5]) : 0; }
+  var READ = DAYS.reduce(function (m, d) { return Math.max(m, stampMs(d.captured)); }, 0), OLD_MS = 7 * 3600e3;
+  function clockOf(ms) { // "13:45", with the weekday when that moment is not today on the visitor's calendar
+    try {
+      var w = new Date(ms), s = w.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+      return w.toDateString() !== new Date().toDateString() ? w.toLocaleDateString("en-GB", { weekday: "short" }) + " " + s : s;
+    } catch (e) { return ""; }
+  }
+  function setRead(i) {
+    var el = $("s-read"), age = READ ? Date.now() - READ : 0, old = age > OLD_MS, h = Math.floor(age / 3600e3);
+    el.className = old ? "old" : "";
+    el.textContent = !READ ? "" : old ? "Last reading " + clockOf(READ) + " · " + (h >= 48 ? Math.floor(h / 24) + " days" : h + " h") + " ago"
+      : i === DAYS.length - 1 ? "Numbers read " + clockOf(READ) : "";
+  }
+  /* a tab left open: every 15 minutes it is in view, ask the site's tiny v.json whether a newer reading is published.
+     Only offers a refresh; never reloads by itself. Anywhere without that file (the private preview) nothing happens. */
+  var freshAt = Date.now();
+  function freshCheck() {
+    if (!READ || document.hidden || Date.now() - freshAt < 15 * 60e3 || !$("s-fresh").hidden || !/^https?:$/.test(location.protocol)) return;
+    freshAt = Date.now();
+    try {
+      fetch("v.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
+        if (v && stampMs(v.captured) > READ) { $("s-fresh").hidden = false; $("s-foot").hidden = false; }
+      }).catch(function () {});
+    } catch (e) {}
+  }
+  function sinceOpen(hhmm) { // "00:32" (UTC; a day opens at 00:00) -> "32 min": the same for every visitor, no time zone
+    var q = /^(\d\d):(\d\d)$/.exec(hhmm || ""); if (!q) return "";
+    var m = +q[1] * 60 + +q[2]; return m >= 60 ? Math.floor(m / 60) + " h " + (m % 60) + " min" : m + " min";
+  }
+  function localClock(hhmm, date) { // a UTC clock time in the visitor's own clock: "14:30 EST"; with the weekday when that moment is not today there
+    try {
+      var q = /^(\d\d):(\d\d)$/.exec(hhmm), t = date ? new Date(date + "T" + hhmm + ":00Z") : new Date();
+      if (!date) t.setUTCHours(+q[1], +q[2], 0, 0);
+      if (isNaN(t.getTime())) throw 0;
+      var s = t.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", timeZoneName: "short" });
+      if (date && t.toDateString() !== new Date().toDateString()) s = t.toLocaleDateString("en-GB", { weekday: "short" }) + " " + s;
+      return s;
+    } catch (e) { return hhmm + " UTC"; }
+  }
+  function setSigning(d) { var s = signingLine(d), el = $("s-name-l"); el.textContent = s; el.className = /^Signing open/.test(s) ? "open" : ""; }
+  /* the percent counts up once, when the board first comes into view (never with reduced motion). The true number
+     is in the page before and after; a change of day stops the count and writes the day's number. */
+  var countRaf = 0, countEnd = null;
+  function countStop() { if (countRaf) cancelAnimationFrame(countRaf); countRaf = 0; if (countEnd) { clearTimeout(countEnd.t); countEnd.f(); countEnd = null; } }
+  function countUp() {
+    var d = DAYS[current], pct = d && d.signed_pct, el = $("s-signed"), fill = $("s-fill"), box = $("stats");
+    if (reduce || pct == null || countRaf) return;
+    var dec = (String(pct).split(".")[1] || "").length, to = Math.max(0, Math.min(100, pct)), last = 0, acc = 0;
+    countEnd = { f: function () { fill.style.transition = ""; el.textContent = pct + "%"; fill.style.width = to + "%"; box.removeAttribute("aria-busy"); },
+      t: setTimeout(countStop, 2600) };
+    box.setAttribute("aria-busy", "true"); fill.style.transition = "none"; fill.style.width = "0%"; el.textContent = (0).toFixed(dec) + "%";
+    countRaf = requestAnimationFrame(function step(now) {
+      if (last) acc += Math.min(40, now - last); last = now; // small steps: a slow frame (the town's first picture) cannot skip the count
+      var u = Math.min(1, acc / 1400), e = 1 - Math.pow(1 - u, 3);
+      el.textContent = (pct * e).toFixed(dec) + "%"; fill.style.width = to * e + "%";
+      if (u < 1) countRaf = requestAnimationFrame(step); else countStop();
+    });
+  }
+  function signingLine(d) { // the small print of the notice. Signing window 00:00-19:00 UTC, final 19:30 UTC; no clock times, so no time zones to translate
+    function span(m) { m = Math.max(0, Math.round(m)); return m >= 60 ? Math.floor(m / 60) + " h " + (m % 60) + " min" : m + " min"; }
+    if (d.old_chain) return "";
+    if (d.final) { var q = /^(\d\d):(\d\d)$/.exec(d.two_thirds_utc || ""); return q ? "Two thirds reached after " + span(+q[1] * 60 + +q[2]) : ""; }
+    var day0 = Date.parse(d.date + "T00:00:00Z") / 1000, closes = day0 + 19 * 3600, fin = day0 + 19.5 * 3600, now = Date.now() / 1000;
+    if (!(day0 > 0) || now < day0 || now > fin + 6 * 3600) return "Final soon";
+    if (now < closes) return "Signing open · " + span((closes - now) / 60) + " left";
+    if (now < fin) return "Signing closed · final in " + span((fin - now) / 60);
+    return "Signing closed · this page updates soon";
+  }
+  function renderDiary() {
+    var box = $("diary"); box.innerHTML = "";
+    for (var i = DAYS.length - 1; i >= 0; i--) (function (i) {
+      var d = DAYS[i], prev = i && !unkSay(DAYS[i - 1]) ? DAYS[i - 1].validators : null, b = document.createElement("button");
+      b.className = "drow" + (d.old_chain ? " old" : ""); b.dataset.i = i;
+      b.innerHTML = "<div class='dd'><b></b><span></span></div><div class='dn'></div><div class='dv'><b></b><span>" + (d.validators === 1 ? "house" : "houses") + "</span></div><div class='dv'><b></b><span>TDH signed</span></div><div class='dv dv3'><b></b><span>2/3 after</span></div>";
+      b.querySelector(".dd b").textContent = d.label;
+      b.querySelector(".dd span").textContent = dayName(i) + (d.old_chain || d.final ? "" : " · in progress");
+      b.querySelector(".dn").textContent = d.name || "Not recorded";
+      var vb = b.querySelectorAll(".dv b");
+      vb[0].textContent = fmt(d.validators); if (prev != null && d.validators !== prev) { var em = document.createElement("em"); em.textContent = (d.validators - prev >= 0 ? "+" : "") + (d.validators - prev); vb[0].appendChild(em); }
+      vb[1].textContent = d.signed_pct != null ? d.signed_pct + "%" : "—"; vb[2].textContent = sinceOpen(d.two_thirds_utc) || "—";
+      b.addEventListener("click", function () { stopPlay(); setDay(i); var t = $("t-stage"); if (t && t.scrollIntoView) t.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" }); });
+      box.appendChild(b);
+    })(i);
+  }
+  function renderCredits() {
+    $("credits").textContent = "Cards in the Meme Museum (CC0): " + CARDS.map(function (c) { return "#" + c.id + " " + c.name + " by " + c.artist; }).join(" · ") + ".";
+  }
+  function renderLegend(root) { // small isometric drawings in the town's own style (the key; or the canvases inside root)
+    function iso(x, ox, oy, w, h, left, right, top) { // a box standing on the ground point (ox, oy)
+      var P = pen(x); x.lineWidth = 2;
+      P.poly([[ox - w, oy - w / 2], [ox, oy], [ox, oy - h], [ox - w, oy - w / 2 - h]], left);
+      P.poly([[ox, oy], [ox + w, oy - w / 2], [ox + w, oy - w / 2 - h], [ox, oy - h]], right);
+      if (top) P.poly([[ox - w, oy - w / 2 - h], [ox, oy - h], [ox + w, oy - w / 2 - h], [ox, oy - w - h]], top);
+    }
+    function house(x, roof, win, curtain) {
+      var ox = 34, oy = 56, w = 17, h = 15, P = pen(x); iso(x, ox, oy, w, h, "#cfc3a8", "#efe5cf");
+      var ax = ox, ay = oy - w / 2 - h - 15; x.lineWidth = 2;
+      P.poly([[ox - w, oy - w / 2 - h], [ox, oy - h], [ax, ay]], shade(roof)); P.poly([[ox, oy - h], [ox + w, oy - w / 2 - h], [ax, ay]], roof);
+      P.poly([[ox + 5, oy - 6], [ox + 11, oy - 9], [ox + 11, oy - 16], [ox + 5, oy - 13]], win);
+      if (curtain) { x.beginPath(); x.moveTo(ox + 8, oy - 7.5); x.lineTo(ox + 8, oy - 14.5); x.lineWidth = 1.4; x.stroke(); }
+    }
+    function shade(hex) { var n = parseInt(hex.slice(1), 16), r = (n >> 16) * 0.72, g = ((n >> 8) & 255) * 0.72, b = (n & 255) * 0.72; return "rgb(" + (r | 0) + "," + (g | 0) + "," + (b | 0) + ")"; }
+    [].forEach.call(root ? root.querySelectorAll("canvas") : document.querySelectorAll(".key canvas"), function (c) {
+      var x = c.getContext("2d"), k = c.dataset.icon; x.clearRect(0, 0, 68, 68); x.lineJoin = "round";
+      if (k === "lit") house(x, "#c8291e", WIN);
+      else if (k === "signed") { house(x, "#c8291e", WIN); x.fillStyle = "#efe5cf"; x.strokeStyle = "#0a0a0a"; x.lineWidth = 2; x.beginPath(); x.arc(52, 17, 10.5, 0, 7); x.fill(); x.stroke();
+        x.strokeStyle = "#c8291e"; x.lineWidth = 3.4; x.lineCap = "round"; x.beginPath(); x.moveTo(46.8, 17.4); x.lineTo(50.6, 21.4); x.lineTo(57.4, 12.6); x.stroke(); x.lineCap = "butt"; }
+      else if (k === "dark") house(x, "#2f7f86", "#23232a");
+      else if (k === "private") house(x, "#45454e", "#ff7a3a", true);
+      else if (k === "dc") { iso(x, 34, 62, 13, 40, "#2a2a30", "#3a3a42", "#4a4a52"); x.strokeStyle = "#00e0f0"; x.lineWidth = 2.4; [14, 24, 34].forEach(function (yy) { x.beginPath(); x.moveTo(36, 62 - yy - 1); x.lineTo(46, 62 - yy - 6); x.stroke(); }); }
+      else if (k === "site") { x.strokeStyle = "#e8d48a"; x.lineWidth = 1.6; var ox = 30, oy = 58, w = 15, h = 18;
+        [[[ox - w, oy - w / 2], [ox, oy], [ox + w, oy - w / 2], [ox, oy - w]], [[ox - w, oy - w / 2 - h], [ox, oy - h], [ox + w, oy - w / 2 - h], [ox, oy - w - h]]].forEach(function (q) { x.beginPath(); q.forEach(function (p, i) { i ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1]); }); x.closePath(); x.stroke(); });
+        [[ox - w, oy - w / 2], [ox, oy], [ox + w, oy - w / 2], [ox, oy - w]].forEach(function (p) { x.beginPath(); x.moveTo(p[0], p[1]); x.lineTo(p[0], p[1] - h); x.stroke(); });
+        x.strokeStyle = "#e8d48a"; x.lineWidth = 2.4; x.beginPath(); x.moveTo(52, 60); x.lineTo(52, 10); x.lineTo(30, 10); x.stroke(); x.beginPath(); x.moveTo(34, 10); x.lineTo(34, 20); x.lineWidth = 1; x.stroke(); }
+      else if (k === "ministry") { iso(x, 30, 60, 18, 12, "#d6cbb2", "#f7eed9", "#efe5cf"); var P = pen(x); x.lineWidth = 2; P.poly([[12, 39], [30, 48], [48, 39], [30, 26]], "#c8291e");
+        x.fillStyle = "#ffcf6b"; x.fillRect(53, 22, 6, 36); x.strokeStyle = "#0a0a0a"; x.lineWidth = 1.5; x.strokeRect(53, 14, 6, 44); x.strokeStyle = "#ff3b2a"; x.lineWidth = 2.5; x.beginPath(); x.moveTo(50, 29); x.lineTo(62, 29); x.stroke(); }
+      else if (k === "radio") { x.strokeStyle = "#cfcfd4"; x.lineWidth = 2; x.beginPath(); x.moveTo(26, 60); x.lineTo(33, 14); x.lineTo(40, 60); x.moveTo(29, 42); x.lineTo(37, 42); x.moveTo(30.5, 30); x.lineTo(35.5, 30); x.stroke();
+        x.fillStyle = "#ff3b2a"; x.beginPath(); x.arc(33, 12, 4, 0, 7); x.fill(); x.strokeStyle = "#ff3b2a"; x.lineWidth = 1.6; x.beginPath(); x.ellipse(33, 12, 16, 6, 0, 0, 7); x.stroke(); }
+      else if (k === "flags") { [["#009c3b", "#ffdf00"], ["#111111", "#dd0000", "#ffce00"], ["#0055a4", "#ffffff", "#ef4135"]].forEach(function (f, i) {
+          var px = 12 + i * 17, py = 18 + i * 4; x.strokeStyle = "#cfcfd4"; x.lineWidth = 1.6; x.beginPath(); x.moveTo(px, py); x.lineTo(px, 62); x.stroke();
+          f.forEach(function (col, j) { x.fillStyle = col; if (f.length === 3) x.fillRect(px + 1, py + j * 4, 13, 4); else x.fillRect(px + 1, py + j * 6, 13, 6); }); x.strokeStyle = "#0a0a0a"; x.lineWidth = 1; x.strokeRect(px + 1, py, 13, 12); }); }
+    });
+  }
+
+  /* ---------------- timeline ---------------- */
+  var current = DAYS.length - 1, playing = null, townView = null;
+  function clearKeyUI() { [].forEach.call(document.querySelectorAll("#t-legend button[data-key], #stats button[aria-pressed]"), function (x) { x.setAttribute("aria-pressed", "false"); }); var n = $("key-note"); if (n) n.textContent = ""; syncFilterUI(); }
+  function syncFilterUI() { // one filter at a time: a roof colour, a row of "Where they are" or a key item; the pill on the town clears it
+    var kb = document.querySelector('#stats button[aria-pressed="true"], #t-legend button[data-key][aria-pressed="true"]'), kk = kb ? kb.dataset.key : "";
+    var t = chipFilter ? (chipFilter === "not_reported" ? "Place not shown" : chipFilter === "dc" ? "Data centers" : CLAB[chipFilter] || "") : ({ lit: "Lights on", signed: "Signed", dark: "Empty houses", private: "Curtains drawn", dc: "Data centers" })[kk] || "";
+    [].forEach.call(document.querySelectorAll("#rows .row"), function (r) { r.setAttribute("aria-pressed", chipFilter && r.dataset.k === chipFilter ? "true" : "false"); });
+    $("rows").classList.toggle("filtering", !!chipFilter);
+    var lg = $("t-legend"); [].forEach.call(lg.children, function (b) { if (b.dataset.k) b.setAttribute("aria-pressed", b.dataset.k === chipFilter ? "true" : "false"); }); lg.classList.toggle("filtering", !!chipFilter);
+    $("t-filter").hidden = !t; $("t-filter-t").textContent = t;
+  }
+  function renderStrip() { // one building per day, as tall as that day's town
+    var s = $("strip"); s.innerHTML = "";
+    var mx = Math.max.apply(null, DAYS.map(function (d) { return d.validators || 0; }).concat([1]));
+    DAYS.forEach(function (d, i) {
+      var b = document.createElement("button"); b.className = "bld" + (d.final ? "" : " wip") + (d.old_chain ? " old" : ""); b.setAttribute("aria-pressed", i === current ? "true" : "false");
+      b.setAttribute("aria-label", d.label + ": " + nOf(d.validators, "house") + (d.name ? ", " + d.name : "") + (d.old_chain ? ", old chain" : "") + (d.final ? "" : ", in progress"));
+      b.title = d.label + " · " + nOf(d.validators, "house") + (d.name ? " · " + d.name : "") + (d.old_chain ? " · old chain" : "");
+      b.innerHTML = "<i></i><span></span>"; b.firstChild.style.height = Math.round(12 + 50 * (d.validators || 0) / mx) + "px";
+      b.lastChild.textContent = String(d.label.split(" ")[1] || i + 1);
+      b.addEventListener("click", function () { stopPlay(); setDay(i); });
+      s.appendChild(b);
+    });
+    s.scrollLeft = s.scrollWidth;
+  }
+  function showDayInStrip() { /* the strip scrolls when it is narrow (a phone): keep the chosen day's building in view */
+    var strip = $("strip"), sel = strip.children[current]; if (!sel) return;
+    var r = sel.getBoundingClientRect(), R = strip.getBoundingClientRect();
+    if (r.left < R.left || r.right > R.right) strip.scrollLeft += r.left - R.left - 8;
+  }
+  window.addEventListener("resize", showDayInStrip);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(showDayInStrip);
+  function setDay(i) {
+    current = i;
+    var strip = $("strip");
+    [].forEach.call(strip.children, function (b, k) { b.setAttribute("aria-pressed", k === i ? "true" : "false"); });
+    $("sky-day").textContent = DAYS[i].label; $("sky-sub").textContent = dayName(i) + " · " + (DAYS[i].final ? nOf(DAYS[i].validators, "house") : "in progress");
+    showDayInStrip(); /* after the caption: its width decides how wide the strip is */
+    renderNumbers(i);
+    if (townView) townView.show(i);
+  }
+  function stopPlay() { if (playing) { clearTimeout(playing); playing = null; } }
+  $("play").addEventListener("click", function () {
+    stopPlay(); var k = 0; setDay(0);
+    (function next() { k++; if (k < DAYS.length) playing = setTimeout(function () { setDay(k); next(); }, 1500); else playing = null; })();
+  });
+
+/*__TOWN__*/
+
+  renderDiary();
+  renderStrip();
+  renderLegend(); try { renderLegend($("stats")); } catch (e) {}
+  setInterval(function () { var d = DAYS[current]; if (d && !d.final) setSigning(d); setRead(current); freshCheck(); }, 30000);
+  document.addEventListener("visibilitychange", freshCheck);
+  $("s-fresh").addEventListener("click", function () { location.reload(); });
+  try { $("f-final").textContent = localClock("19:30"); } catch (e) {}
+  var SITE = "https://6529town.com";
+  function shareText() { var d = DAYS[DAYS.length - 1]; return "6529 Town today: " + fmt(d.validators) + " validators" + (d.name ? ", “" + d.name + "”" : "") + (d.signed_pct != null ? ", " + d.signed_pct + "% of the town's TDH signed" : "") + ". An imaginary town that grows with the 6529 validator network, one house per validator."; }
+  $("share").addEventListener("click", function (e) {
+    e.stopPropagation(); fullLeave(); // the pop is outside the picture
+    $("share-card").hidden = !(townView && townView.postcard);
+    $("share-x").href = "https://x.com/intent/post?text=" + encodeURIComponent(shareText()) + "&url=" + encodeURIComponent(SITE);
+    $("share-pop").hidden = !$("share-pop").hidden;
+  });
+  /* postcard: a picture of the town as it looks now, to keep or post (drawn in the browser, nothing is uploaded) */
+  var pcUrl = null, pcBlob = null, PCNAME = "6529-town-postcard.png";
+  // postcard buttons: the words that go with a shared postcard; is this a phone; can this browser copy a picture
+  var PCTEXT = "Greetings from 6529 Town", PCTOUCH = false, PCCOPY = false;
+  try { PCTOUCH = window.matchMedia("(pointer: coarse)").matches; } catch (e) {}
+  try { PCCOPY = !!(navigator.clipboard && navigator.clipboard.write && window.ClipboardItem); } catch (e) {}
+  function pcFile() { try { return pcBlob ? new File([pcBlob], PCNAME, { type: "image/png" }) : null; } catch (e) { return null; } }
+  function pcMake(kind, tries) {
+    if ($("pc").hidden) return;
+    var c = townView && townView.postcard ? townView.postcard(kind) : null;
+    if (!c) { if ((tries || 0) < 25) setTimeout(function () { pcMake(kind, (tries || 0) + 1); }, 400); return; } // the town is still arriving (first seconds after the page opens)
+    [].forEach.call(document.querySelectorAll("#pc-pick button"), function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-k") === kind)); });
+    c.toBlob(function (b) {
+      if (!b) return; pcBlob = b; if (pcUrl) URL.revokeObjectURL(pcUrl); pcUrl = URL.createObjectURL(b);
+      $("pc-img").src = pcUrl; $("pc-img").hidden = false; $("pc-save").href = pcUrl; $("pc-save").hidden = false;
+      var f = pcFile(), can = false; try { can = !!(f && navigator.canShare && navigator.canShare({ files: [f] })); } catch (e) {}
+      var sheet = can && PCTOUCH; // a phone hands the postcard itself to its own share list; a computer goes straight to X
+      $("pc-share").hidden = !sheet; $("pc-post").hidden = sheet; $("pc-copy").hidden = !PCCOPY;
+      $("pc-tip").textContent = !sheet && PCCOPY ? "Copy the postcard, then paste it into your post" : "Or press and hold the postcard to save it";
+    }, "image/png");
+  }
+  function pcOpen() {
+    fullLeave(); // the postcard is outside the picture: leave full screen first
+    $("share-pop").hidden = true; if (!townView || !townView.postcard) return;
+    $("pc-pick").hidden = !townView.myHouse();
+    var done = false, go = function () { if (done) return; done = true; $("pc-img").hidden = true; $("pc-save").hidden = true; $("pc-share").hidden = true; $("pc-post").hidden = true; $("pc-copy").hidden = true; $("pc").hidden = false; pcMake("town"); };
+    try { Promise.all(['900 100px "Big Shoulders Stencil Display"', "400 40px Anton", '500 27px "Martian Mono"', '600 17px "Martian Mono"'].map(function (f) { return document.fonts.load(f); })).then(go, go); } catch (e) { go(); }
+    setTimeout(go, 1200);
+  }
+  function pcClose() { $("pc").hidden = true; }
+  $("share-card").addEventListener("click", function (e) { e.stopPropagation(); pcOpen(); });
+  $("pc-x").addEventListener("click", pcClose);
+  $("pc").addEventListener("click", function (e) { if (e.target === $("pc")) pcClose(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("pc").hidden) pcClose(); });
+  [].forEach.call(document.querySelectorAll("#pc-pick button"), function (b) { b.addEventListener("click", function () { pcMake(b.getAttribute("data-k")); }); });
+  $("pc-share").addEventListener("click", function () { var f = pcFile(); if (!f) return; try { navigator.share({ files: [f], text: PCTEXT + " " + SITE }).catch(function () {}); } catch (e) {} });
+  $("pc-post").href = "https://x.com/intent/post?text=" + encodeURIComponent(PCTEXT) + "&url=" + encodeURIComponent(SITE);
+  $("pc-copy").addEventListener("click", function () { // the postcard itself goes to the clipboard, to paste into a post
+    var b = $("pc-copy"); b.style.minWidth = b.offsetWidth + "px";
+    function done(ok) { b.textContent = ok ? "Copied ✓" : "Could not copy"; setTimeout(function () { b.textContent = "Copy postcard"; }, 2400); }
+    try { if (!pcBlob) { done(false); return; } navigator.clipboard.write([new ClipboardItem({ "image/png": pcBlob })]).then(function () { done(true); }, function () { done(false); }); } catch (e) { done(false); }
+  });
+  $("share-copy").addEventListener("click", function () {
+    function done(ok) { $("share-copy").textContent = ok ? "Copied ✓" : SITE; setTimeout(function () { $("share-copy").textContent = "Copy link"; }, 2400); }
+    try { navigator.clipboard.writeText(SITE).then(function () { done(true); }, function () { done(false); }); } catch (e) { done(false); }
+  });
+  document.addEventListener("click", function (e) { var pop = $("share-pop"); if (!pop.hidden && !pop.contains(e.target) && e.target.id !== "share") pop.hidden = true; });
+  document.addEventListener("click", function (e) { // the plate's buttons and the "empty houses" chip; the chip is rebuilt with the roof line, so one listener for all
+    var b = e.target && e.target.closest ? e.target.closest("#stats button[data-key], #t-legend button[data-key]") : null;
+    if (b) {
+      if (!townView) return; if (view !== "town") { location.hash = "town"; }
+      var on = townView.keyAction(b.dataset.key), d = DAYS[current], note = "";
+      [].forEach.call(document.querySelectorAll("#stats button[data-key], #t-legend button[data-key]"), function (x) { x.setAttribute("aria-pressed", on && x.dataset.key === on ? "true" : "false"); });
+      if (on === "dark") { var dark = townView.emptyCount ? townView.emptyCount() : 0; if (!dark) note = "No empty houses on " + d.label + ": every house in town took part."; else note = nOf(dark, "empty house") + " on " + d.label + (dark === 1 ? ": a validator that took part on an earlier day but not on this one." : ": validators that took part on an earlier day but not on this one."); }
+      else if (on === "site") { var nn = nextNew(d); note = nn == null ? "Arrivals for the day after " + d.label + " were not recorded." : nn ? (current === DAYS.length - 1 ? nOf(nn, "more validator") + (nn === 1 ? " has" : " have") + " registered for the day after " + d.label + "." : nOf(nn, "new house") + " went up the day after " + d.label + ".") : current === DAYS.length - 1 ? "Nobody new has registered for the next day yet." : "Nobody new moved in the day after " + d.label + "."; }
+      else if (on === "lit") note = nOf(d.validators, "house") + " with the lights on on " + d.label + ".";
+      else if (on === "signed") note = d.signed_validators != null ? fmt(d.signed_validators) + " of " + nOf(d.validators, "house") + (d.final ? " signed on " : " have signed so far on ") + d.label + "." : "";
+      else if (on === "private") note = d.old_chain ? "The old chain didn't keep places, so every house on " + d.label + " has the curtains drawn." : nOf((d.continents || {}).not_reported || 0, "validator") + " don't show their place on " + d.label + ".";
+      else if (on === "dc") note = d.old_chain ? "The old chain didn't keep places, so " + d.label + " has no data center towers." : nOf((d.places || {}).data_center || 0, "data center validator") + " on " + d.label + ".";
+      $("key-note").textContent = on ? note : ""; syncFilterUI();
+      var r = $("t-stage").getBoundingClientRect(); if (r.top < 0 || r.top > window.innerHeight * 0.6) $("t-stage").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+    }
+  });
+  try { townView = makeTownView($("t-canvas"), $("t-stage")); } catch (e) { townView = null; if (window.console) console.error(e); }
+  if (!townView) { $("t-canvas").style.display = "none"; $("t-hint").hidden = true; var n = document.createElement("p"); n.className = "nogl"; n.textContent = "This browser can't draw the 3D town. The numbers are below."; $("t-stage").appendChild(n); }
+  var view = "town"; // one view: the town (the globe tab went 11-09: for 9 in 10 validators the place was unknown)
+  if (townView) townView.setActive(true);
+  $("t-filter").addEventListener("click", function () { chipFilter = null; if (townView) townView.setFilter(null); else syncFilterUI(); });
+  $("whole").addEventListener("click", function () { if (townView) townView.fit(); });
+  /* full screen (step 30): the corner button shows the town alone on the whole screen; the same button, Esc or the
+     system's own way out (a phone's back gesture) brings the page back as it was, at the same place. Real full screen of
+     the picture where the browser allows it; else (iPhone, in-app browsers, frames) the picture fills the window and the
+     page under it holds still. Meanwhile everything outside the picture is inert; whatever opens outside it (the share
+     pop, the postcard) leaves full screen first, and closes when full screen starts. The town keeps its view and redraws
+     at the new size (it measures on a window resize, so one is sent after every change). */
+  var fullMode = "", fullKeep = null, fullHeld = [], fullT = 0; // fullMode: "" | "ask" (waiting for the browser) | "real" | "fill"
+  function fullEl() { return document.fullscreenElement || document.webkitFullscreenElement || null; }
+  function fullNudge() { var go = function () { try { window.dispatchEvent(new Event("resize")); } catch (e) {} }; go(); requestAnimationFrame(go); } // now, and once the browser has settled
+  var cardTap = null; // where the last touch or click on the picture was, and when: a card must not step under it (that tap's click would land on the card)
+  $("t-stage").addEventListener("pointerdown", function (e) { var r = $("t-stage").getBoundingClientRect(); cardTap = [e.clientX - r.left, e.clientY - r.top, Date.now()]; }, true);
+  function cardClear(fit) { // an open card and the corner buttons. In full screen the card stays inside the picture and steps off the buttons
+    // (the way out stays in view); in the normal view it stays where the town put it and a button under it steps aside until it closes.
+    // fit: the picture has just come back to its own size from full screen, so the card is brought inside it and off the buttons
+    var c = $("t-card"), s = $("t-stage"), full = s.classList.contains("full"), ids = ["whole", "t-full"], b = null;
+    var zone = function (e) { return [e.offsetLeft - 8, e.offsetTop - 8, e.offsetLeft + e.offsetWidth + 8, e.offsetTop + e.offsetHeight + 8]; }; // a shown button and 8 px round it
+    if (!c.classList.contains("on")) { ids.forEach(function (id) { $(id).classList.remove("under"); }); return; }
+    var W = s.clientWidth, H = s.clientHeight, w = c.offsetWidth, h = c.offsetHeight, x = c.offsetLeft, y = c.offsetTop;
+    if (full || fit) { x = Math.max(8, Math.min(W - w - 8, x)); y = Math.max(8, Math.min(H - h - 8, y)); }
+    var on = function (r, px, py) { return r && px < r[2] && px + w > r[0] && py < r[3] && py + h > r[1]; };
+    ids.forEach(function (id) { var e = $(id), r = e.offsetWidth ? zone(e) : null; if (r) b = b ? [Math.min(b[0], r[0]), Math.min(b[1], r[1]), Math.max(b[2], r[2]), Math.max(b[3], r[3])] : r; });
+    if ((full || fit) && on(b, x, y)) { // a card the page has to move anyway steps off the buttons
+      var t = cardTap && Date.now() - cardTap[2] < 1500 ? cardTap : null;
+      var free = function (o) { return o[0] >= 8 && o[1] >= 8 && o[0] + w <= W - 8 && o[1] + h <= H - 8 && !on(b, o[0], o[1]) && !(t && t[0] > o[0] - 16 && t[0] < o[0] + w + 16 && t[1] > o[1] - 16 && t[1] < o[1] + h + 16); };
+      var o = [[x, b[1] - h], [x, t ? t[1] - 24 - h : -1], [x, b[3]], [b[0] - w, y]].filter(free)[0]; if (o) { x = o[0]; y = o[1]; } // above the buttons, above the finger, below the buttons, beside them; else it stays (the buttons stay on top)
+    }
+    ids.forEach(function (id) { var e = $(id), u = !full && !!e.offsetWidth && !!on(zone(e), x, y); e.classList.toggle("under", u);
+      if (u && document.activeElement === e) $("t-card-x").focus({ preventScroll: true }); }); // a button that steps aside hands its focus to the card over it
+    if (c.offsetLeft !== x) c.style.left = x + "px"; if (c.offsetTop !== y) c.style.top = y + "px";
+  }
+  function fullVV() { // filling the window of a zoomed-in phone page (or one with its keyboard up): the two corner buttons stay in what
+    // the visitor sees, at their own size, each kept to the nearer edges of the visible part
+    var v = window.visualViewport, s = $("t-stage"), W = s.clientWidth, H = s.clientHeight;
+    ["whole", "t-full"].forEach(function (id) {
+      var e = $(id), t = "";
+      if (fullMode === "fill" && v && v.scale > 0 && e.offsetWidth) {
+        var k = 1 / v.scale, x = e.offsetLeft, y = e.offsetTop, nx = v.offsetLeft + (2 * x + e.offsetWidth > W ? v.width - (W - x) * k : x * k), ny = v.offsetTop + (2 * y + e.offsetHeight > H ? v.height - (H - y) * k : y * k);
+        if (Math.abs(nx - x) > 0.5 || Math.abs(ny - y) > 0.5 || Math.abs(k - 1) > 0.002) t = "translate(" + (nx - x).toFixed(1) + "px, " + (ny - y).toFixed(1) + "px) scale(" + k.toFixed(4) + ")";
+      }
+      if (e.style.transform !== t) { e.style.transform = t; if (!e.style.cssText) e.removeAttribute("style"); }
+    });
+  }
+  function fullVVon(on) { var v = window.visualViewport; if (v) ["resize", "scroll"].forEach(function (n) { v.removeEventListener(n, fullVV); if (on) v.addEventListener(n, fullVV); }); }
+  function fullBtn(on) { var b = $("t-full"), t = on ? "Leave full screen" : "Full screen"; b.setAttribute("aria-pressed", String(on)); b.setAttribute("aria-label", t); b.title = t; }
+  function fullEsc(e) { if (fullMode === "fill" && (e.key === "Escape" || e.key === "Esc")) { e.preventDefault(); e.stopPropagation(); fullLeave(); } } // as in real full screen, Esc only leaves it
+  function fullOn(m) {
+    var s = $("t-stage"); clearTimeout(fullT); fullMode = m;
+    s.classList.add("full"); s.classList.toggle("fill", m === "fill"); document.documentElement.classList.toggle("town-fill", m === "fill");
+    if (!fullHeld.length) for (var a = s; a !== document.body && a.parentElement; a = a.parentElement) // everything beside the picture and its boxes: no focus, no taps
+      [].forEach.call(a.parentElement.children, function (x) { if (x !== a && x.tagName !== "SCRIPT" && !x.hasAttribute("inert")) { x.setAttribute("inert", ""); fullHeld.push(x); } });
+    window.removeEventListener("keydown", fullEsc, true); if (m === "fill") window.addEventListener("keydown", fullEsc, true);
+    fullVVon(m === "fill"); fullBtn(true); cardClear(); fullVV(); fullNudge();
+  }
+  function fullOff() {
+    if (!fullMode) return;
+    var s = $("t-stage"), k = fullKeep, root = document.documentElement;
+    clearTimeout(fullT); fullMode = ""; fullKeep = null; window.removeEventListener("keydown", fullEsc, true); fullVVon(false);
+    fullHeld.forEach(function (x) { x.removeAttribute("inert"); }); fullHeld = [];
+    s.classList.remove("full", "fill"); root.classList.remove("town-fill"); fullBtn(false);
+    if (k) { root.classList.add("town-snap"); window.scrollTo(k[0], k[1]); root.classList.remove("town-snap"); } // back to the same place at once (the page scrolls smoothly otherwise)
+    cardClear(true); fullVV(); fullNudge();
+  }
+  function fullExit() { var x = document.exitFullscreen || document.webkitExitFullscreen; if (x && fullEl()) try { var q = x.call(document); if (q && q.catch) q.catch(function () {}); } catch (e) {} }
+  function fullLeave() { // the button, Esc, and before anything opens outside the picture
+    if (fullMode === "real" && fullEl()) { fullExit(); clearTimeout(fullT); fullT = setTimeout(fullOff, 1500); } // the page comes back when the browser says it is out; the timer in case it never says
+    else fullOff();
+  }
+  function fullEnter() {
+    if (!$("pc").hidden) pcClose(); $("share-pop").hidden = true; // nothing that lives outside the picture stays open behind it
+    var s = $("t-stage"), ask = s.requestFullscreen || s.webkitRequestFullscreen, en = document.fullscreenEnabled != null ? document.fullscreenEnabled : document.webkitFullscreenEnabled;
+    fullKeep = [window.pageXOffset || 0, window.pageYOffset || 0];
+    if (typeof ask !== "function" || en === false) { fullOn("fill"); return; }
+    var no = function () { if (fullMode === "ask" && fullEl() !== s) fullOn("fill"); }; // refused, or no answer: fill the window instead
+    fullMode = "ask"; fullT = setTimeout(no, 2000);
+    try { var q = ask.call(s, { navigationUI: "hide" }); if (q && typeof q.then === "function") q.then(null, no); } catch (e) { no(); }
+  }
+  function fullChange() {
+    var s = $("t-stage"), el = fullEl();
+    if (el === s) { if (!fullMode) fullExit(); else if (fullMode !== "real") fullOn("real"); else fullNudge(); } // a yes that came after the visitor had left: out again
+    else if (!el && fullMode === "real") fullOff();
+  }
+  ["fullscreenchange", "webkitfullscreenchange"].forEach(function (n) { document.addEventListener(n, fullChange); });
+  ["fullscreenerror", "webkitfullscreenerror"].forEach(function (n) { document.addEventListener(n, function () { if (fullMode === "ask" && fullEl() !== $("t-stage")) fullOn("fill"); }); });
+  $("t-full").addEventListener("click", function () { if (fullMode === "ask") return; if (fullMode) fullLeave(); else fullEnter(); });
+  if (window.MutationObserver) { // the card opens or moves, the pill (it lifts the buttons on phones) comes or goes, a tour starts or ends
+    var cardSeen = new MutationObserver(function () { cardClear(); fullVV(); });
+    cardSeen.observe($("t-card"), { attributes: true, attributeFilter: ["class", "style"] }); cardSeen.observe($("t-filter"), { attributes: true, attributeFilter: ["hidden"] });
+    cardSeen.observe($("t-stage"), { attributes: true, attributeFilter: ["class"] });
+  }
+  window.addEventListener("resize", function () { cardClear(); }); // a phone turned in full screen: an open card keeps inside the picture
+  setDay(current);
+  if (!reduce) (function () { // on screen at page open: count at once (no flash of the full number first); else when it scrolls into view
+    var el = $("s-signed"), r = el.getBoundingClientRect();
+    if (r.height && r.top >= 0 && r.bottom <= window.innerHeight) { countUp(); return; }
+    if (!("IntersectionObserver" in window)) return;
+    var io = new IntersectionObserver(function (es) { if (es.some(function (e) { return e.isIntersecting; })) { io.disconnect(); countUp(); } }, { threshold: 0.9 });
+    io.observe(el);
+  })();
+})();
+</script>

@@ -1,0 +1,2 @@
+# The version the town is built with. Newer versions should work too.
+Pillow==12.2.0

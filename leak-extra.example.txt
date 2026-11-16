@@ -1,0 +1,16 @@
+# Your own private words for the two privacy checks (build.py and deploy-cf.cjs).
+# Copy this file to leak-extra.txt (it is in .gitignore) and add one word or pattern per line.
+# If the finished page contains a match, the run stops and nothing is uploaded. When build.py finds the match,
+# it moves the page that failed to dist/failed-*.html so that you can look at it.
+# Matching ignores upper/lower case. Lines starting with # are ignored.
+# Both Python and JavaScript read these lines, so use plain words or simple patterns that work in both
+# (no (?i), \A, \Z or (?P<name>...)).
+#
+# Good things to put here:
+#   your validator's key code
+#   your machine's name
+#   your own name or nickname
+#
+# Example lines (remove the # and use your own):
+#my-host-name
+#\bmynickname\b
