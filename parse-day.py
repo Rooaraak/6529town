@@ -78,6 +78,35 @@ def versions_block(txt):
     return [["not reported" if a == "Not reported" else a, 0 if b == "<1" else int(b)] for a, b in got]
 
 
+def version_counts(txt):
+    # the same "Validators by version" block, for the town's "What they run" card: how many validators run each release,
+    # with the page's note after the release name ("below minimum") or "". [[release, validators, note], ...] in the
+    # page's order. None when the block is not there or any release line in it is not read.
+    m = re.search(r"^Validators by version\n(.*?)^Validators by location$", txt, re.M | re.S)
+    if not m:
+        return None
+    got = re.findall(r"^(rc\.\d+|Not reported)(?: ([A-Za-z][A-Za-z ]*))?\n+(?:\d+|<1)%\n+of the TDH\n+(\d+)\n+validators?$", m.group(1), re.M)
+    if not got or len(got) != len(re.findall(r"^(?:rc\.\d+|Not reported)(?: [^\n]*)?$", m.group(1), re.M)):
+        return None
+    return [["not reported" if a == "Not reported" else a, int(n), note.strip()] for a, note, n in got]
+
+
+def chain_tile(txt):
+    # the "6529 chain" tile: "<x>%" / "Slots with a block" / "Final block <n> min behind" (may end ", usually <m>").
+    # {"slots_pct": x, "final_lag_min": n}; n is None when that line reads differently (e.g. no final block for a while).
+    # None when the tile is not there exactly once or its first two lines read differently.
+    ls = [x.strip() for x in txt.split("\n") if x.strip()]
+    at = [k for k, x in enumerate(ls) if x == "6529 chain"]
+    if len(at) != 1 or at[0] + 2 >= len(ls):
+        return None
+    k = at[0]
+    pct = re.fullmatch(r"(\d+(?:\.\d+)?)%", ls[k + 1])
+    if not pct or ls[k + 2] != "Slots with a block":
+        return None
+    lag = re.fullmatch(r"Final block (\d+) min behind(?:, usually \d+)?", ls[k + 3]) if k + 3 < len(ls) else None
+    return {"slots_pct": float(pct.group(1)), "final_lag_min": int(lag.group(1)) if lag else None}
+
+
 def nickname(history_txt, label):
     # History page: "<Mon 9 Nov>\nSigned Open Meadow. ..." / Today page after final: "<label> · Final · Open Meadow"
     m = re.search(re.escape(label) + r"\n(?:Signed|Final|Agreed)[^\n]*?\b([A-Z][a-z]+ [A-Z][a-z]+)\b", history_txt)
@@ -142,6 +171,9 @@ def build(cap):
     places["not_reported"] = v - sum(places.values())
     two = datetime.fromtimestamp(rec["strong_unix"], timezone.utc).strftime("%H:%M") if rec.get("strong_unix") else None
     stamp = os.path.basename(cap.rstrip("/"))
+    vc = version_counts(txt)
+    if vc is not None and sum(n for _, n, _ in vc) != v:  # shown only when it adds up to the day's validators
+        vc = None
     return {
         "date": iso, "label": label, "cycle_day": cd,
         "final": "FINAL" in (rec.get("flags") or []),
@@ -154,6 +186,7 @@ def build(cap):
         "next_validators": net.get("next_keys"), "next_accounts": net.get("next_accounts"),
         "continents": cont, "places": places,
         "countries": countries_line(txt), "versions": versions_line(txt),
+        "version_counts": vc, "chain": chain_tile(txt),
         "captured": stamp, "source": "validator page (read-only)",
     }
 

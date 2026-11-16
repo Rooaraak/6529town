@@ -86,6 +86,39 @@ def by_version(t):
     return out or None
 
 
+def release_rows(t, validators):
+    # the "Validators by version" block again, for the "What they run" card: [[release, validators, note], ...] in the
+    # page's order (note = the words after the release name, such as "below minimum", or "").
+    # None when anything in the block reads differently or the counts do not add up to the day's validators.
+    a = t.find("\nValidators by version\n")
+    b = t.find("\nValidators by location\n", a)
+    if a < 0 or b < a or t.count("\nValidators by version\n") != 1:
+        return None
+    ls = [x.strip() for x in t[a:b].split("\n") if x.strip()][1:]
+    name = lambda x: re.fullmatch(r"(rc\.\d+|Not reported)( [A-Za-z][A-Za-z ]*)?", x)
+    i = next((k for k, x in enumerate(ls) if name(x)), None)
+    if i is None or (len(ls) - i) % 5:
+        return None
+    out = []
+    for k in range(i, len(ls), 5):
+        nm = name(ls[k])
+        if not nm or not re.fullmatch(r"(\d+|<1)%", ls[k + 1]) or ls[k + 2] != "of the TDH" or not re.fullmatch(r"\d+", ls[k + 3]) or not re.fullmatch(r"validators?", ls[k + 4]):
+            return None
+        out.append(["not reported" if nm[1] == "Not reported" else nm[1], int(ls[k + 3]), (nm[2] or "").strip()])
+    return out if out and sum(r[1] for r in out) == validators else None
+
+
+def chain_tile(t):
+    # the "6529 chain" tile: "6529 chain" / "<x>%" / "Slots with a block" / "Final block <n> min behind[, usually <m>]".
+    # {"slots_pct": x, "final_lag_min": n}; n is None when the last line reads differently. None when the tile is not
+    # there exactly once or reads differently.
+    m = re.findall(r"^6529 chain\n+(\d+(?:\.\d+)?)%\n+Slots with a block\n+([^\n]*)$", t, re.M)
+    if len(m) != 1 or len(re.findall(r"^\s*6529 chain\s*$", t, re.M)) != 1:
+        return None
+    lag = re.fullmatch(r"Final block (\d+) min behind(, usually \d+)?", m[0][1].strip())
+    return {"slots_pct": float(m[0][0]), "final_lag_min": int(lag[1]) if lag else None}
+
+
 def country_block(t):
     # validator rc.18 and later: the block "Country" ... "Each bar is out of all": "<n> of <m> named a country."
     # and then the lines in twos: country / count (the full list shows only after its read-only toggle was opened).
@@ -158,6 +191,12 @@ def page_day(rec, t, today):
     m = re.search(r"Today's result\n+([^\n]+)", today or "")
     if m and re.search(r"^" + re.escape(L) + r"$", today, re.M):
         check(L, "result name", m[1].strip(), rec["name"])
+    if "version_counts" in rec:  # records made before these two fields existed are not shown with them
+        check(L, "validators per release", release_rows(t, rec["validators"]), rec["version_counts"])
+        if rec["version_counts"] is not None:
+            check(L, "release counts add up", sum(r[1] for r in rec["version_counts"]), rec["validators"])
+    if "chain" in rec:
+        check(L, "6529 chain", chain_tile(t), rec["chain"])
 
 
 def houses(days, reg, built):
