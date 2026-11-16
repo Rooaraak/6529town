@@ -2068,7 +2068,7 @@
         mineRow(bodyEl, here[0]); var inp = $("t-mine-input"); if (inp && !inp.value) inp.value = short;
       }
       var card = $("t-card"), W = stage.clientWidth, H = stage.clientHeight, cw = Math.min(290, W * 0.82);
-      card.style.left = ((W - cw) / 2) + "px"; card.style.top = Math.max(8, H * 0.56) + "px"; card.classList.add("on"); snd.bell();
+      card.style.left = ((W - cw) / 2) + "px"; card.style.top = bellTop(Math.max(8, H * 0.56), card, H) + "px"; card.classList.add("on"); snd.bell();
     }
     $("t-find-go").addEventListener("click", function () { var f = $("t-find"); f.hidden = !f.hidden; if (!f.hidden) { if (tour) stopTour(true); setTimeout(function () { $("t-find-in").focus(); }, 30); } });
     $("t-find-x").addEventListener("click", function () { $("t-find").hidden = true; });
@@ -2097,7 +2097,7 @@
       if (h) { star.userData.y = h.dc ? 2.0 : (h.tall ? 1.55 : 1.2); star.position.set(h.x, star.userData.y, h.z); }
       go.hidden = !h; if (h) { $("t-mine-name-b").textContent = mine.name; $("t-lab-mine-name").textContent = mine.name; }
     }
-    function setMine(m) { mine = m; try { if (m) localStorage.setItem(MINE_KEY, JSON.stringify(m)); else localStorage.removeItem(MINE_KEY); } catch (e) {} placeMine(); }
+    function setMine(m) { if (bellOK && bellGet() && (!m || !mine || m.idx !== mine.idx)) bellOff(); mine = m; try { if (m) localStorage.setItem(MINE_KEY, JSON.stringify(m)); else localStorage.removeItem(MINE_KEY); } catch (e) {} placeMine(); }
     function goMine(party) { var h = mineHouse(); if (!h) return; hopAt[h.idx] = performance.now(); anim = true; st.auto = false; flyTo(h.x, h.z, 4.2, 0.55); if (party) { burst(h.x, h.z); setTimeout(function () { burst(h.x, h.z); }, 450); } }
     function mineRow(el, h) {
       var row = document.createElement("div"); row.className = "mine-row";
@@ -2108,14 +2108,152 @@
       } else {
         var inp = document.createElement("input"); inp.type = "text"; inp.maxLength = 24; inp.placeholder = "Name it"; inp.id = "t-mine-input"; inp.setAttribute("aria-label", "A name for your house");
         var go = document.createElement("button"); go.className = "btn solid"; go.textContent = mine ? "Move here" : "Make it mine";
-        function save(e) { if (e) e.stopPropagation(); setMine({ idx: h.idx, name: (inp.value || "").trim().slice(0, 24) || "My house" }); closeCard(); goMine(true); }
+        function save(e) { if (e) e.stopPropagation(); setMine({ idx: h.idx, name: (inp.value || "").trim().slice(0, 24) || "My house" }); if (bellCan()) bellCard(); else closeCard(); goMine(true); }
         go.addEventListener("click", save); inp.addEventListener("keydown", function (e) { e.stopPropagation(); if (e.key === "Enter") save(e); });
         ["pointerdown", "pointerup", "click"].forEach(function (ev) { inp.addEventListener(ev, function (e) { e.stopPropagation(); }); });
         row.appendChild(inp); row.appendChild(go);
       }
-      el.appendChild(row);
+      el.appendChild(row); if (bellCan()) bellRow(el, h);
     }
-    $("t-mine-go").addEventListener("click", function () { goMine(false); });
+    /* bell on your house (bellpage): the house you found and kept can ring this device when it needs you. Only on the real site
+       (BELL.host over https) and only while BELL.mode lets it: "open", or "hash" once the page was opened with #bell (that
+       sets a trial flag) or a bell is stored. The browser gives a push address; the town's server keeps that address and the
+       house number (no wallet, no name) and sends the notifications. This browser keeps {h: house number, t: last yes from
+       the server} under town6529-bell. Turning it off, moving out or keeping another house deletes it. */
+    var BELL = { host: "", key: "", mode: "off" };
+    var BELL_WAIT = 20000, BELL_POST = 15000, BELL_ST = "town6529-bell", BELL_TRY = "town6529-bell-try"; // register + ready + subscribe at most BELL_WAIT ms, the server's answer at most BELL_POST ms
+    var bellOK = (function () { // read once at start: the page sets its own hash later
+      if (location.protocol !== "https:" || location.hostname !== BELL.host) return false;
+      if (BELL.mode === "open") return true; if (BELL.mode !== "hash") return false;
+      if (location.hash === "#bell") { try { localStorage.setItem(BELL_TRY, "1"); } catch (e) {} return true; }
+      try { return !!(localStorage.getItem(BELL_TRY) || localStorage.getItem(BELL_ST)); } catch (e) { return false; }
+    })();
+    function bellCan() { return bellOK; }
+    var bellBusy = false, bellOffing = 0, bellJust = false, bellSay = "", bellShow = false; // a try is running; turning off is still under way; turned on in this page; the line after the last try; the visitor used the row
+    var OFFSAY = "It rings on this device when your house needs you.";
+    function bellGet() { try { var s = JSON.parse(localStorage.getItem(BELL_ST) || "null"); return s && typeof s.h === "number" && s.h % 1 === 0 && s.h > 0 && typeof s.t === "number" ? s : null; } catch (e) { return null; } }
+    function bellPut(s) { try { if (s) localStorage.setItem(BELL_ST, JSON.stringify(s)); else localStorage.removeItem(BELL_ST); } catch (e) {} }
+    function bellIsOn() { var s = bellGet(); return !!(bellOK && s && mine && s.h === mine.idx + 1); }
+    function bellAble() { return "serviceWorker" in navigator && "PushManager" in window && "Notification" in window; }
+    function bellIOS() { var n = navigator; return /iPhone|iPad|iPod/.test(n.userAgent || "") || (n.platform === "MacIntel" && n.maxTouchPoints > 1); }
+    function bellHome() { return navigator.standalone === true || !!(window.matchMedia && matchMedia("(display-mode: standalone)").matches); }
+    function bellB64(buf) { var b = new Uint8Array(buf), s = ""; for (var i = 0; i < b.length; i++) s += String.fromCharCode(b[i]); return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
+    function bellKey() { var s = atob(BELL.key.replace(/-/g, "+").replace(/_/g, "/")), k = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) k[i] = s.charCodeAt(i); return k; }
+    function bellSend(sub, h) { // POST the address and the house number: the answer's status (200 only with {"ok":true}, -1 a 200 without it, 0 no answer)
+      var ac = window.AbortController ? new AbortController() : null, tm = ac ? setTimeout(function () { ac.abort(); }, BELL_POST) : 0;
+      var body = JSON.stringify({ e: sub.endpoint, p: bellB64(sub.getKey("p256dh")), a: bellB64(sub.getKey("auth")), h: h });
+      return fetch("/api/bell", { method: "POST", headers: { "content-type": "application/json" }, body: body, credentials: "omit", cache: "no-store", signal: ac ? ac.signal : undefined })
+        .then(function (r) { return r.status !== 200 ? r.status : r.json().then(function (j) { return j && j.ok === true ? 200 : -1; }, function () { return -1; }); })
+        .then(function (c) { clearTimeout(tm); return c; }, function () { clearTimeout(tm); return 0; });
+    }
+    function bellDrop(sub) { try { return sub.unsubscribe().then(null, function () {}); } catch (e) { return Promise.resolve(); } }
+    function bellCut(sub) { // the server forgets this address (DELETE), then the browser drops it
+      try { fetch("/api/bell", { method: "DELETE", headers: { "content-type": "application/json" }, body: JSON.stringify({ e: sub.endpoint, a: bellB64(sub.getKey("auth")) }), credentials: "omit", cache: "no-store", keepalive: true }).then(null, function () {}); } catch (e) {}
+      return bellDrop(sub);
+    }
+    function bellOff() { // the one way off (the button; setMine: moving out or keeping another house): the state goes first, the row shows off at once
+      // while the old address is deleted (and for at least 0.6 s, so the second click of a double click lands on a held button) no new turn-on
+      // starts: it would get the same registration, and the unregister at the end of this chain would take its new address with it
+      var t0 = Date.now(), left = true, done = function () { if (left) { left = false; setTimeout(function () { bellOffing--; bellSync(); }, Math.max(0, 600 - (Date.now() - t0))); } };
+      bellPut(null); bellJust = false; bellSay = ""; bellOffing++; bellSync(); setTimeout(done, BELL_WAIT); // BELL_WAIT: a browser that never answers does not hold the button for ever
+      try {
+        navigator.serviceWorker.getRegistration("/").then(function (reg) {
+          if (!reg) return;
+          return (reg.pushManager ? reg.pushManager.getSubscription() : Promise.resolve(null)).then(function (sub) { return sub ? bellCut(sub) : null; }).then(function () {
+            var w = reg.active || reg.waiting || reg.installing;
+            if (w && new URL(w.scriptURL).pathname === "/sw.js") return reg.unregister();
+          });
+        }).then(done, done);
+      } catch (e) { done(); }
+    }
+    function bellOn() { // the button: permission first (nothing awaited before it), then the push address, then the server
+      if (bellBusy || bellOffing || !mine) return;
+      var h = mine.idx + 1, sub = null, late = false, tm = 0;
+      try { localStorage.setItem(BELL_TRY + "-x", "1"); localStorage.removeItem(BELL_TRY + "-x"); } catch (e) { bellSay = "The bell could not be turned on. Try again later."; bellSync(); return; } // no storage: nothing is asked or sent
+      bellBusy = true; bellSync();
+      new Promise(function (ok) { var q = Notification.requestPermission(ok); if (q && q.then) q.then(ok, function () { ok("default"); }); }).then(function (perm) {
+        if (perm !== "granted") { bellSay = perm === "denied" ? "Notifications are blocked for this site. Allow them in your browser settings." : "Notifications are not allowed yet. Try again, or turn them on for this browser in your device's settings."; return; } // not allowed: back to off, the line says why
+        var get = navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then(function () { return navigator.serviceWorker.ready; })
+          .then(function (reg) { return reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: bellKey() }); });
+        get.then(function (s) { if (late) bellDrop(s); }, function () {}); // an address that comes after the time limit is dropped at once
+        return new Promise(function (ok, no) { tm = setTimeout(function () { late = true; no(new Error("time")); }, BELL_WAIT); get.then(ok, no); })
+          .then(function (s) { clearTimeout(tm); sub = s; return bellSend(s, h); })
+          .then(function (c) {
+            if (c === 200 && mine && mine.idx + 1 === h) bellPut({ h: h, t: Math.floor(Date.now() / 1000) });
+            if (c === 200 && bellIsOn()) { bellJust = true; bellSay = ""; return; }
+            if (c === 200) { bellPut(null); bellCut(sub); bellSay = mine && mine.idx + 1 === h ? "The bell could not be turned on. Try again later." : ""; return; } // kept nowhere (no storage, or the visitor moved meanwhile: no fail line then): the server forgets it again
+            (c === 400 || c === 403 || c === 410 || c === 502 || c === 503 ? bellDrop : bellCut)(sub); // the server's own "nothing stored" answers; after any other (no answer, a 200 without {"ok":true}) it may have kept it: DELETE too (always 204)
+            bellSay = c === 503 || c === 410 ? "The bell is not open right now. Try again later." : c === 400 || c === 403 ? "This browser's notification service is not supported yet." : navigator.brave ? "In Brave: turn on \"Use Google services for push messaging\" in Settings, Privacy and security. Restart Brave and try again." : "The bell could not be turned on. Try again later.";
+          });
+      }).then(null, function () { // refused, thrown or out of time: no address is left behind
+        clearTimeout(tm); if (sub) bellDrop(sub);
+        bellSay = navigator.brave ? "In Brave: turn on \"Use Google services for push messaging\" in Settings, Privacy and security. Restart Brave and try again." : "The bell could not be turned on. Try again later.";
+      }).then(function () { bellBusy = false; bellSync(); });
+    }
+    function bellCheck() { // page open with a stored bell: still the kept house, still allowed, still subscribed; a quiet refresh after 7 days
+      var s = bellGet(); if (!bellOK || !s) return;
+      if (!mine || s.h !== mine.idx + 1 || !bellAble() || Notification.permission !== "granted") { bellOff(); return; }
+      navigator.serviceWorker.getRegistration("/").then(function (reg) { return reg && reg.pushManager ? reg.pushManager.getSubscription() : null; }).then(function (sub) {
+        if (!sub) { bellPut(null); bellSync(); return; } // the browser dropped it
+        if (Date.now() / 1000 - s.t <= 7 * 86400) return;
+        return bellSend(sub, s.h).then(function (c) {
+          var n = bellGet(); if (!n || n.h !== s.h || n.t !== s.t) return; // turned off (or off and on again: a new t) meanwhile
+          if (c === 200) bellPut({ h: s.h, t: Math.floor(Date.now() / 1000) }); else if (c === 400 || c === 403 || c === 410) bellOff();
+        });
+      }).then(null, function () {});
+    }
+    var bellRoof = new THREE.Sprite(new THREE.SpriteMaterial({ transparent: true, depthWrite: false, map: (function () { // a tiny gold bell beside the roof star (a child of it: it moves and hides with it)
+      var c = document.createElement("canvas"); c.width = c.height = 128; var x = c.getContext("2d"); x.translate(64, 60); x.lineJoin = "round"; x.lineWidth = 8; x.strokeStyle = "#0a0a0a"; x.fillStyle = "#ffcf6b";
+      x.beginPath(); x.arc(0, -40, 8, 0, 7); x.stroke(); x.beginPath(); x.arc(0, 40, 11, 0, 7); x.fill(); x.stroke();
+      x.beginPath(); x.moveTo(-44, 36); x.quadraticCurveTo(-30, 28, -30, 2); x.bezierCurveTo(-30, -44, 30, -44, 30, 2); x.quadraticCurveTo(30, 28, 44, 36); x.closePath(); x.fill(); x.stroke();
+      return new THREE.CanvasTexture(c); })() }));
+    bellRoof.center.set(-1.15, -0.05); bellRoof.scale.set(0.5, 0.5, 1); bellRoof.visible = false; bellRoof.renderOrder = 6; star.add(bellRoof); // right of the star, low: clear of the star and its name tag
+    var BELL_SVG = '<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M3.8 11.6V7.2a4.2 4.2 0 0 1 8.4 0v4.4l1.4 1.2H2.4z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M6.4 14.3a1.7 1.7 0 0 0 3.2 0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+    function bellRow(el, h) { // after the mine row: your own house gets the bell row (ONE button and the ?, ONE line, the help under it), a house not kept yet the hint
+      bellShow = false; setTimeout(bellFit, 0); // once the card is placed (pick, showFound and the small card place it after this)
+      if (!mine || mine.idx !== h.idx) { var q = document.createElement("p"); q.className = "bell-hint"; q.textContent = "Keep your house to get a bell when it needs you."; el.appendChild(q); return; }
+      var row = document.createElement("div"), b = document.createElement("button"), say = document.createElement("p"); row.className = "mine-row bell-row"; row.id = "t-bell";
+      b.type = "button"; b.className = "btn"; b.innerHTML = BELL_SVG; b.appendChild(document.createTextNode("")); say.className = "bell-say";
+      b.addEventListener("click", function (e) { e.stopPropagation(); if (bellBusy || bellOffing) return; bellShow = true; if (bellIsOn()) bellOff(); else bellOn(); });
+      var ask = document.createElement("button"), help = document.createElement("div"); // the "?" beside the button, in every state (also when the button is hidden): the help under the line, closed on every new card
+      ask.type = "button"; ask.className = "bell-q"; ask.textContent = "?"; ask.title = "Help with the bell"; ask.setAttribute("aria-label", "Help with the bell"); ask.setAttribute("aria-expanded", "false"); ask.setAttribute("aria-controls", "t-bell-help");
+      help.className = "bell-help"; help.id = "t-bell-help"; help.hidden = true;
+      ["iPhone or iPad: tap Share, then Add to Home Screen. Open the town from there and turn on the bell.", "Computer: allow notifications for your browser in your system settings and turn off Do not disturb. The browser must be running.", "Phone: Do not disturb or battery saving can hold a notification back."].forEach(function (s) { var l = document.createElement("p"); l.textContent = s; help.appendChild(l); });
+      ask.addEventListener("click", function (e) { e.stopPropagation(); help.hidden = !help.hidden; ask.setAttribute("aria-expanded", help.hidden ? "false" : "true"); bellShow = true; bellSync(); }); // bellSync: the card fits again (bellFit), the open help scrolls into view
+      row.appendChild(b); row.appendChild(ask); row.appendChild(say); row.appendChild(help); el.appendChild(row); bellSync(); // first the button (bellSync takes the first button and the first line of the row)
+    }
+    function bellSync() { // the roof bell and the row (if a card shows it) follow the state
+      bellRoof.visible = bellIsOn();
+      var row = $("t-bell"); if (!row) return;
+      var hh = mine ? HOUSES[mine.idx] : null, b = row.querySelector("button"), say = row.querySelector("p"), bt = "", ln;
+      if (!hh || !DAYS[hh.day] || !DAYS[hh.day].final) ln = "The bell opens after your house's first full day."; // the house number can still change on its first day
+      else if (!bellAble()) ln = bellIOS() && !bellHome() ? "On iPhone: tap Share, then Add to Home Screen. Open the town from there and find your house again." : "This browser cannot show notifications.";
+      else if (bellBusy) { bt = "One moment…"; ln = say.textContent || OFFSAY; }
+      else if (bellIsOn()) { bt = "Turn off the bell"; ln = "Bell on ✓ " + (bellJust ? "A test notification is on its way. Nothing arrived? Tap ?" : OFFSAY); }
+      else { bt = "Turn on the bell"; ln = bellSay || OFFSAY; }
+      b.style.display = bt ? "" : "none"; b.lastChild.nodeValue = bt; b.disabled = !!(bellBusy || bellOffing); say.textContent = ln;
+      bellFit(); var bd = $("t-card-body"), d = row.getBoundingClientRect().bottom - bd.getBoundingClientRect().bottom; if (bellShow && bd.contains(row) && d > 0) bd.scrollTop += d; // a card that scrolls keeps the new line in view (its body scrolls: the close button stays)
+    }
+    function bellFit() { // a card with the new rows: inside the picture (it scrolls if it must: page.html), and the gold go button steps aside while the card is over it
+      var c = $("t-card"), go = $("t-mine-go"), H = stage.clientHeight, row = $("t-bell") || c.querySelector(".bell-hint"), h = c.offsetHeight, u = false;
+      if (!row || !c.classList.contains("on") || !c.contains(row)) return;
+      if (c.offsetTop + h > H - 8) c.style.top = Math.max(8, H - h - 8) + "px";
+      if (typeof cardClear === "function") { cardClear(); h = c.offsetHeight; } // the full-screen code (page.html): the card grew, so it steps off the corner buttons again
+      if (go.offsetWidth) u = c.offsetLeft < go.offsetLeft + go.offsetWidth + 6 && go.offsetLeft < c.offsetLeft + c.offsetWidth + 6 && c.offsetTop < go.offsetTop + go.offsetHeight + 6 && go.offsetTop < c.offsetTop + h + 6;
+      go.classList.toggle("bell-under", u);
+    }
+    function bellTop(y, c, H) { return bellOK ? Math.max(8, Math.min(y, H - c.offsetHeight - 8)) : y; } // a card with the new rows stays inside the picture
+    function bellCard() { // the small card of the kept house: after Make it mine / Move here, and from the gold go button
+      var h = mine ? HOUSES[mine.idx] : null; if (!h) return;
+      closeCard(); hideTip();
+      var bd = $("t-card-body"), c = $("t-card"), W = stage.clientWidth, H = stage.clientHeight, cw = Math.min(290, W * 0.82);
+      bd.innerHTML = "<h3></h3><p></p>"; bd.querySelector("h3").textContent = "★ " + mine.name; bd.querySelector("p").textContent = "Your house, kept in this browser.";
+      mineRow(bd, h);
+      c.style.left = ((W - cw) / 2) + "px"; c.style.top = bellTop(Math.max(8, H * 0.56), c, H) + "px"; c.classList.add("on"); snd.bell();
+    }
+    if (bellOK) { $("f-bell").hidden = false; bellSync(); setTimeout(function () { try { bellCheck(); } catch (e) {} }, 0); }
+    if (bellOK) window.addEventListener("resize", function () { setTimeout(bellFit, 0); }); // a phone turned, full screen on or off: the page has moved an open card (page.html), the gold go button follows
+    $("t-mine-go").addEventListener("click", function () { goMine(false); if (bellCan()) bellCard(); });
 
     /* weather follows the day: clear on strong days (shooting stars, moonlight on the sea), clouds when agreement is weak, rain under 2/3 */
     var weather = "clear";
@@ -2620,11 +2758,11 @@
       try {
         tween = null; selectRing(null);
         if (h) { st.tx = h.x; st.tz = h.z; st.el = 0.55; st.half = st.halfT = 2.8; } else { st.tx = to.tx; st.tz = to.tz; st.el = to.el; st.half = st.halfT = cardFit * to.half / fitHalf; }
-        cap = { w: PW, h: PH }; stageG.userData.tick(); renderer.setPixelRatio(1); renderer.setSize(PW, PH, false);
+        bellRoof.visible = false; cap = { w: PW, h: PH }; stageG.userData.tick(); renderer.setPixelRatio(1); renderer.setSize(PW, PH, false);
         last = performance.now(); step(last);
         x.fillStyle = "#050506"; x.fillRect(M, M, PW, PH); x.drawImage(renderer.domElement, M, M, PW, PH);
       } finally {
-        cap = null; st.tx = keep.tx; st.tz = keep.tz; st.half = keep.half; st.halfT = keep.halfT; st.el = keep.el; tween = keep.tween; selectRing(keep.sel);
+        cap = null; bellRoof.visible = bellIsOn(); st.tx = keep.tx; st.tz = keep.tz; st.half = keep.half; st.halfT = keep.halfT; st.el = keep.el; tween = keep.tween; selectRing(keep.sel);
         resize(); last = performance.now(); step(last);
       }
       x.strokeStyle = "rgba(23,23,26,.6)"; x.lineWidth = 3; x.strokeRect(M + 1.5, M + 1.5, PW - 3, PH - 3);

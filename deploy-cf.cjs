@@ -39,6 +39,24 @@ if (fs.existsSync(FILES["/index.html"].path) && fs.readFileSync(FILES["/index.ht
   if (gone.length) { console.error("DEPLOY FAILED: the page plays songs, but music/ lacks " + gone.map((n) => n + ".mp3").join(" ")); process.exit(1); }
 }
 
+// the bell (optional, README.md): build.py writes dist/worker/ only when bell-public.json is there. Then the service
+// worker, the manifest and the two icons go up with the page, and the worker pair is attached to the same deployment
+// (it answers only /api/bell, see _routes.json). Without dist/worker/ the upload is exactly as without the bell.
+const BELL = {}, WK = __dirname + "/dist/worker/";
+if (fs.existsSync(WK + "_worker.js") || fs.existsSync(WK + "_routes.json")) {
+  for (const [route, name, type] of [["/sw.js", "sw.js", "text/javascript"], ["/manifest.webmanifest", "manifest.webmanifest", "application/manifest+json"], ["/icon-192.png", "icon-192.png", "image/png"], ["/icon-512.png", "icon-512.png", "image/png"]]) {
+    const p = __dirname + "/dist/site/" + name;
+    if (!fs.existsSync(p)) { console.error("DEPLOY FAILED: the bell's worker is in dist/worker/, but dist/site/ lacks " + name + " (build again)"); process.exit(1); }
+    FILES[route] = { path: p, type };
+  }
+  for (const name of ["_worker.js", "_routes.json"]) if (!fs.existsSync(WK + name)) { console.error("DEPLOY FAILED: dist/worker/ lacks " + name + " (build again)"); process.exit(1); }
+  if (fs.readFileSync(WK + "_routes.json", "utf8").trim() !== '{"version":1,"include":["/api/bell","/api/bell/*"],"exclude":[]}') { console.error("DEPLOY FAILED: dist/worker/_routes.json is not the bell's"); process.exit(1); }
+  const w = fs.readFileSync(WK + "_worker.js", "utf8");
+  if (!w.includes("export default {") || !w.includes("env.ASSETS.fetch(request)") || w.length > 200000) { console.error("DEPLOY FAILED: dist/worker/_worker.js is not the bell's worker"); process.exit(1); }
+  BELL["/_worker.js"] = { path: WK + "_worker.js", type: "application/javascript" };
+  BELL["/_routes.json"] = { path: WK + "_routes.json", type: "application/json" };
+}
+
 async function cf(path, opts = {}, auth = TOKEN) {
   const r = await fetch(path.startsWith("http") ? path : API + path, { ...opts, headers: { Authorization: "Bearer " + auth, ...(opts.headers || {}) } });
   const j = await r.json().catch(() => ({ success: false, errors: [{ message: "HTTP " + r.status + " (not JSON)" }] }));
@@ -49,13 +67,13 @@ const hashOf = (buf, ext) => Buffer.from(blake3(Buffer.from(buf.toString("base64
 
 (async () => {
   // a shorter version of the build's privacy check, once more, before anything goes public
-  for (const [route, f] of Object.entries(FILES)) {
-    if (f.type === "image/jpeg" || f.type === "audio/mpeg") continue;
+  for (const [route, f] of Object.entries({ ...FILES, ...BELL })) {   // with the bell: its worker pair too
+    if (f.type === "image/jpeg" || f.type === "image/png" || f.type === "audio/mpeg") continue;
     const text = fs.readFileSync(f.path, "utf8").replace(/data:image\/[a-z]+;base64,[A-Za-z0-9+/=]+/g, "");
     for (const re of [/0x[0-9a-fA-F]{8,}/, /12D3Koo/, /DESKTOP-/i, /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/, /0x[0-9a-fA-F]{4}…/, /This PC/i, ...EXTRA])
       if (re.test(text)) throw new Error("leak gate tripped in " + route + ": " + (EXTRA.includes(re) ? "a pattern from leak-extra.txt (not shown)" : re));
   }
-  if (process.argv.includes("--dry")) { console.log("dry run, would upload:", Object.keys(FILES).join(" ")); return; }
+  if (process.argv.includes("--dry")) { console.log("dry run, would upload:", Object.keys(FILES).join(" ") + (BELL["/_worker.js"] ? " + the bell's worker (_worker.js, _routes.json)" : "")); return; }
 
   let project = null;
   try { project = await cf(`/accounts/${ACCOUNT}/pages/projects/${PROJECT}`); } catch (e) { if (!process.argv.includes("--create")) throw e; }
@@ -86,6 +104,7 @@ const hashOf = (buf, ext) => Buffer.from(blake3(Buffer.from(buf.toString("base64
   const form = new FormData();
   form.append("manifest", JSON.stringify(manifest));
   form.append("branch", "main");
+  for (const [route, f] of Object.entries(BELL)) form.append(route.slice(1), new File([fs.readFileSync(f.path)], route.slice(1), { type: f.type }));
   const dep = await cf(`/accounts/${ACCOUNT}/pages/projects/${PROJECT}/deployments`, { method: "POST", body: form });
   console.log("uploaded", todo.length, "of", assets.length, "files ·", (fs.statSync(FILES["/index.html"].path).size / 1024).toFixed(0), "KB");
   console.log("deployment", dep.id, dep.url, "| live:", "https://" + (project.subdomain || PROJECT + ".pages.dev"));

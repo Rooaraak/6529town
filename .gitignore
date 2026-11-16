@@ -7,6 +7,9 @@ network-history.jsonl
 # your own settings, private words and secret files (keep the secret files outside this folder anyway)
 config.env*
 !config.example.env
+bell-public.json
+bell.json
+bell.STOP
 leak-extra.txt*
 *token*
 *account*

@@ -153,6 +153,45 @@ timer is already installed, remove its old lines with `crontab -e` first.
 If you publish your own copy of the code, start a new, empty git repository in this folder first, and check
 with `git status` that `raw/`, `data/`, `config.env` and `leak-extra.txt` are not in it.
 
+## The bell (optional)
+
+A visitor who found and kept their house can turn on a bell for it. That phone or computer then gets a
+notification when the house has not signed about two hours before signing closes (19:00 UTC), and when a new
+validator version is out. The bell is off until you set it up; until then nothing of it is published and the page
+looks and works as before.
+
+| File | What it does |
+|---|---|
+| `bell/worker/_worker.js`, `_routes.json` | A small Cloudflare Pages worker that answers only `/api/bell`. For each bell it keeps the device's notification address and one house number (no wallet, no name) in a D1 database, and it sends the notifications. `bundle.py` makes `_worker.js` from `bell/worker/src/`. |
+| `bell/site/` | `sw.js` (the service worker, it shows the notifications), the app manifest and two icons. `sw-off.js` is not published: it is a twin of `sw.js` that removes itself, for the day the bell goes away. |
+| `bell/bell-ring.py` | Runs after each upload. It reads the published page and tells the worker which houses have not signed yet, or that a new version is out. It never sees a notification address. |
+| `bell/test/` | Tests without network. From `bell/`: `node --test test/<name>.test.mjs` and `python3 -I test/test_ring.py`. |
+
+To turn it on:
+
+1. In the Cloudflare Pages project (production): bind a D1 database as `DB`, set the variable `BELL_HOST` to your
+   site's host name, and add two secrets: `VAPID_JWK` (the private P-256 key for the notifications, as JSON) and
+   `RING_KEY` (32 or more random characters).
+2. Put `bell-public.json` into this folder: `{"host": "your.host", "key": "<public key>", "mode": "hash"}`. The key is
+   the public half of `VAPID_JWK` in base64url (87 characters). Mode `hash` shows the bell only to visitors who open
+   the page with `#bell` at the end of the address (for a trial), `open` to everyone who kept a house, `off` to no one.
+3. Put the ring key into a file outside this folder (`chmod 600`) and name it in `TOWN_BELL_KEY_FILE` in `config.env`.
+4. Optional: `bell.json` says what the sender does: `{"house": "dry", "version": "dry", "empty": "off"}`. `dry` only
+   counts and sends nothing, `live` sends, `off` skips. Without the file everything is `dry`.
+
+With `bell-public.json` in place, `build.py` writes the bell's line into the page, copies `sw.js`, the manifest and
+the icons into `dist/site/` and the worker into `dist/worker/`, and `deploy-cf.cjs` attaches the worker to the same
+deployment. If the file is not right, the build prints `BELL CONFIG REFUSED` and goes on with the bell off on the
+page. Before the first bell, the worker makes its tables once: a POST to `/api/bell/ring` with the body
+`{"op":"init"}`, the header `content-type: application/json` and the ring key in the header `x-bell-key`.
+`bell/bell-ring.py` talks only to the first address in its list `ALLOWED_URLS` (`https://6529town.com`); for your
+own town, put your site there.
+
+To stop it, put an empty file `bell.STOP` into this folder: the next run takes the bell off the page and the sender
+stops. The worker and `sw.js` stay published, so nothing breaks on devices that have a bell; they get no more
+notifications. To close the bell for new devices at the worker as well, send the ring operation
+`{"op":"off","on":true}` the same way as `init` (`{"op":"off","on":false}` opens it again).
+
 ## Credits and licence
 
 The code and the town's own tune (song 1) are under the MIT licence, see `LICENSE`. The other songs, the Meme

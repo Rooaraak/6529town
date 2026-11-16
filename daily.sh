@@ -111,6 +111,17 @@ else
   log "upload skipped (CF_PROJECT is not set): the finished site is in dist/site/"
   DONE="built, not uploaded"
 fi
+# the bell (optional, README.md): after a publish, bell/bell-ring.py asks the site's worker to ring the bells of houses
+# that have not signed yet (and for a new validator version). Whatever it does, this run's result stays the same.
+if [[ "$DONE" == published && -f "$M/bell-public.json" ]]; then
+  if [[ -f "$M/bell.STOP" ]]; then
+    log "bell: stopped (bell.STOP is there)"
+  else
+    timeout -k 10 300 python3 -I bell/bell-ring.py --page dist/site/index.html --state data/bell-state.json --conf bell.json \
+      --stop bell.STOP --key-file "${TOWN_BELL_KEY_FILE:-}" < /dev/null >> "$M/daily.log" 2>&1 \
+      || log "bell: the sender failed or took too long (the town itself was published)"
+  fi
+fi
 # keep, for each day, the reading that its day record names (the houses are rebuilt from that one) and the newest
 # one; other same-day captures go after a day
 python3 - <<'PY' >> "$M/daily.log" 2>&1

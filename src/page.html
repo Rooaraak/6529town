@@ -1,6 +1,9 @@
 <title>6529 Town</title>
 <meta name="description" content="An imaginary town that grows with the 6529 validator network, one house per validator. Unofficial community project.">
 <meta name="claude:viewport-fit-sides" content="cover">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<script>/* the site's <head> is written by the build, so on the site these two links come right after <body>: browsers read them only in <head> */[].forEach.call(document.querySelectorAll('body > link[rel="manifest"], body > link[rel="apple-touch-icon"]'), function (l) { document.head.appendChild(l); });</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Big+Shoulders+Stencil+Display:wght@700;900&family=Archivo:wdth,wght@62..125,300..900&family=Martian+Mono:wght@300..600&display=swap">
@@ -134,6 +137,16 @@ button,a{font:inherit;color:inherit}
 .mine-row input:focus{outline:2px solid var(--gold);outline-offset:1px}
 .mine-row .btn{padding:9px 12px}
 .mine-own{margin:0!important;flex:1;color:var(--gold)!important;font-weight:600}
+.bell-row .btn{letter-spacing:.1em}.bell-row .btn svg{flex:none;color:var(--gold)}.bell-row .btn:disabled{opacity:.6;cursor:default}
+.bell-row .bell-say{flex:1 0 100%;margin:0}.card .bell-hint{margin-top:10px;font-size:12px;color:var(--muted)}
+/* the round ? beside the bell button (same line: the button leaves room for it) and the help it opens under the line */
+.bell-row .bell-say{order:1;flex:1 0 calc(100% - 42px)}.bell-row .bell-q{order:2;flex:none;width:34px;height:34px;padding:0;border:1px solid var(--line-2);border-radius:50%;background:var(--surface);color:var(--gold);font-family:var(--f-mono);font-size:14px;font-weight:600;line-height:1;cursor:pointer;transition:background-color .2s,border-color .2s}
+.bell-row .bell-q:hover,.bell-row .bell-q[aria-expanded="true"]{background:var(--surface-2);border-color:var(--muted-2)}
+.bell-row .bell-help{order:3;flex:1 0 100%;border-left:2px solid var(--line-2);padding-left:10px}.card .bell-help p{margin:6px 0 0;font-size:12.5px}.card .bell-help p:first-child{margin-top:0}
+/* a card with the bell row or the hint stays inside the picture (its body scrolls if it must, the close button stays); the gold go button steps aside while that card is over it */
+.card:has(#t-bell),.card:has(.bell-hint){max-height:calc(100% - 16px);display:flex;flex-direction:column;overflow:hidden}
+.card:has(#t-bell)>#t-card-body,.card:has(.bell-hint)>#t-card-body{overflow-y:auto;min-height:0;overscroll-behavior:contain}
+#t-card.on:has(#t-bell)~#t-mine-go.bell-under,#t-card.on:has(.bell-hint)~#t-mine-go.bell-under{visibility:hidden}
 .banner{position:absolute;left:50%;top:22%;z-index:5;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
 .banner b{display:block;font-family:var(--f-poster);font-weight:900;font-size:clamp(46px,7vw,96px);line-height:.9;text-transform:uppercase;color:var(--win);text-shadow:.04em .04em 0 var(--red),0 0 30px rgba(0,0,0,.6)}
 .banner span{display:inline-block;margin-top:10px;font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;background:rgba(19,19,22,.9);border:1px solid var(--line-2);border-radius:10px;padding:6px 10px;color:var(--text)}
@@ -686,6 +699,7 @@ html.town-snap{scroll-behavior:auto}
         <summary class="mono">How it works</summary>
         <ul>
           <li><b>Numbers.</b> Read from one validator's own Network page every 2 hours. A day is final at <span id="f-final">19:30 UTC</span>. Per house the page keeps a few facts (first day, part of the world, data center, took part, signed) and, for “Find your house”, a scrambled wallet code with that wallet's TDH, which only shows when someone enters that wallet's address. No wallets, no names.</li>
+          <li id="f-bell" hidden><b>Bell.</b> Only on the house you found and kept. If you turn it on, the town stores this device's notification address and your house number. No wallet, no name. It rings when your house has not signed about two hours before signing closes, and when a new validator version is out. Turning it off or moving out deletes it.</li>
           <li><b>Houses.</b> One per validator. Each continent has its own quarter; the lot inside it is made up. Roof colour shows the continent reported that day. Data centers stand apart, beyond the factory. Places are what each validator chose to publish. A garden tree grows a little every day for its first weeks, and a lantern marks the houses here since the first day of house records.</li>
           <li><b>Planes and lights.</b> Paper planes fly between houses that took part that day. Gold lights run from houses that signed to the Ministry of Validation. Both are for show, not one per real message.</li>
           <li><b>Sound.</b> Off until you tap the speaker. Eight quiet songs: the town's own tune, then free music (CC0) by cynicmusic, Destin715, KarateStudios, HoliznaCC0 and Tsorthan Grove. On a computer, a soft chime is a gold light being counted.</li>

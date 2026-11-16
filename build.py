@@ -339,6 +339,7 @@ def build():
         data.update({"sites": sites, "csites": country_sites(mask, names, need), "swiss": SWISS, "land": land_rings()})
         page = page.replace("/*__GLOBE__*/", open(f"{M}/{SRC}/globe.js").read())
     page = page.replace("/*__TOWN__*/", open(f"{M}/{SRC}/town.js").read())
+    page, bell_on = bell(page, secrets)
     if "/*__STAGE__*/null" in page:  # the town of 11-10 has the Main Stage posters; an older page has no such mark
         assert page.count("/*__STAGE__*/null") == 1
         page = page.replace("/*__STAGE__*/null", stage(secrets))
@@ -386,7 +387,70 @@ def build():
     for name, wanted in (("v.json", 'id="s-fresh"' in page), ("404.html", 'id="s-fresh"' in page and os.path.exists(f"{M}/{SRC}/404.html"))):
         if not wanted and os.path.isfile(f"{M}/{DIST}/site/{name}"):
             os.remove(f"{M}/{DIST}/site/{name}")
+    bell_files(bell_on)
     return out, len(html.encode()), leak, {k: len(v) for k, v in sites.items()}
+
+
+# The bell (optional, README.md "The bell"): bell-public.json in this folder = {"host", "key", "mode"} for the page;
+# then the site also gets the bell's files (bell/site/) and the worker pair (bell/worker/ -> dist/worker/, read by
+# deploy-cf.cjs). bell.STOP in this folder keeps the bell off on the page. No bell-public.json: nothing of the bell.
+BELL_LINE = 'var BELL = { host: "", key: "", mode: "off" };'  # src/town.js holds this line once; the build fills it in
+BELL_LINKS = '<link rel="manifest" href="/manifest.webmanifest">\n<link rel="apple-touch-icon" href="/icon-192.png">\n'
+BELL_SITE = ("sw.js", "manifest.webmanifest", "icon-192.png", "icon-512.png")
+BELL_WORKER = ("_worker.js", "_routes.json")
+
+
+def bell(page, secrets=()):
+    """The bell's line of the page. Returns (page, whether the bell's files go up with the site). A bell-public.json that
+    is not right never stops the build: the bell on the page stays off and its server files still go up (phones that have
+    a bell keep a working site). Without the files the page loses its two links to them."""
+    conf = os.path.join(M, "bell-public.json")
+    if not os.path.exists(conf):
+        return page.replace(BELL_LINKS, ""), False
+    gone = [d + "/" + n for d, ns in (("site", BELL_SITE), ("worker", BELL_WORKER)) for n in ns if not os.path.isfile(f"{M}/bell/{d}/{n}")]
+    if page.count(BELL_LINE) != 1 or gone:
+        print("BELL CONFIG REFUSED:", "bell/" + gone[0] + " is missing" if gone else "the page has no place for the bell (src/town.js)",
+              "- the bell stays off and none of its files go up")
+        return page.replace(BELL_LINKS, ""), False
+    try:
+        if os.path.getsize(conf) > 4096:
+            raise ValueError("the file is too large")
+        try:
+            b = json.load(open(conf, encoding="utf-8"))
+        except Exception:  # also a file nested too deep for the reader
+            raise ValueError("the file is not JSON")
+        if not isinstance(b, dict) or sorted(b) != ["host", "key", "mode"] or not all(isinstance(v, str) for v in b.values()):
+            raise ValueError('it must hold exactly "host", "key" and "mode", each as text')
+        if not re.fullmatch(r"[a-z0-9.-]{1,253}", b["host"]):
+            raise ValueError("host must be a plain host name (a-z 0-9 . -)")
+        if b["mode"] not in ("off", "hash", "open"):
+            raise ValueError('mode must be "off", "hash" or "open"')
+        if not re.fullmatch(r"[A-Za-z0-9_-]{87}", b["key"]) or base64.urlsafe_b64decode(b["key"] + "=")[:1] != b"\x04":
+            raise ValueError("key must be the public key in base64url (87 characters, a 65-byte P-256 point)")
+        stop = os.path.exists(os.path.join(M, "bell.STOP"))
+        line = 'var BELL = { host: "%s", key: "%s", mode: "%s" };' % (b["host"], b["key"], "off" if stop else b["mode"])
+        if any(re.search(pat, line, re.I) for pat in LEAK_PATTERNS) or any(x and x.lower() in line.lower() for x in secrets):
+            raise ValueError("the line would trip the privacy check")
+    except Exception as e:  # never the end of the build
+        print("BELL CONFIG REFUSED: bell-public.json:", str(e)[:120], "- the bell on the page stays off, its server files still go up")
+        return page, True
+    print("bell:", "bell.STOP is there, so the bell on the page is off (its server files still go up)" if stop else "mode %s for %s" % (b["mode"], b["host"]))
+    return page.replace(BELL_LINE, line), True
+
+
+def bell_files(on):
+    """Copies the bell's files to where the upload finds them (on), or takes old copies away (off), as with v.json."""
+    import shutil
+    for d, names, out in (("site", BELL_SITE, f"{M}/{DIST}/site"), ("worker", BELL_WORKER, f"{M}/{DIST}/worker")):
+        if on:
+            os.makedirs(out, exist_ok=True)
+        for n in names:
+            if on:
+                shutil.copyfile(f"{M}/bell/{d}/{n}", f"{out}/{n}.tmp"); os.replace(f"{out}/{n}.tmp", f"{out}/{n}")
+            elif os.path.isfile(f"{out}/{n}"):
+                os.remove(f"{out}/{n}")
+    if not on and os.path.isdir(f"{M}/{DIST}/worker") and not os.listdir(f"{M}/{DIST}/worker"):
+        os.rmdir(f"{M}/{DIST}/worker")
 
 
 def stage(secrets=()):

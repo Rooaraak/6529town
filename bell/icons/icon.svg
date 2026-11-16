@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="g" cx="50%" cy="56%" r="62%">
+      <stop offset="0" stop-color="#1b2347"/>
+      <stop offset="1" stop-color="#0b1020"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="#0b1020"/>
+  <rect width="512" height="512" fill="url(#g)"/>
+  <!-- ground line -->
+  <rect x="112" y="388" width="288" height="10" rx="5" fill="#e8d48a" opacity=".9"/>
+  <!-- chimney -->
+  <rect x="318" y="150" width="34" height="74" fill="#efe5cf"/>
+  <!-- walls -->
+  <rect x="150" y="246" width="212" height="142" fill="#efe5cf"/>
+  <!-- roof -->
+  <path d="M256 118 L404 256 H108 Z" fill="#c8291e"/>
+  <path d="M256 118 L404 256 H372 L256 148 L140 256 H108 Z" fill="#e2382b"/>
+  <!-- door -->
+  <path d="M232 388 V318 a24 24 0 0 1 48 0 V388 Z" fill="#131316"/>
+  <!-- lit windows -->
+  <rect x="174" y="282" width="40" height="40" rx="4" fill="#ffcf6b"/>
+  <rect x="298" y="282" width="40" height="40" rx="4" fill="#ffcf6b"/>
+</svg>
