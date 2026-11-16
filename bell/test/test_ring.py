@@ -31,7 +31,7 @@ DAY = 86400
 TODAY = 20770                      # a synthetic UTC day number
 CLOSE = TODAY * DAY + 68400        # 19:00 UTC that day
 NOW = CLOSE - 7200                 # inside the window, on a whole minute
-S, U, E = 0x81, 0x01, 0x00         # signed / on the roster but not signed / not on the roster
+S, U, E = 0x09, 0x01, 0x00         # signed / on the roster but not signed / not on the roster
 KEY_MARK = "KEYMARK-" + "q7Zp" * 10  # a synthetic ring key (48 chars)
 
 
@@ -737,34 +737,34 @@ class TestHouse(Base):
 
 
 class TestBits(Base):
-    """SPEC 7.1: 0 = not on the roster; otherwise bit 8 (0x80) set = signed. The low 7 bits may hold anything."""
+    """SPEC 7.1: 0 = not on the roster; otherwise the 8 (0x08) set = signed, as the page build writes it. The other bits may hold anything."""
 
     def test_only_bit_8_decides(self):
         t = Town(30)
         for j, row in enumerate(t.rows):
             for i in range(len(row)):
-                row[i] = 0x80 | (1 + (i * 5 + j * 3) % 127)        # signed, low bits 1..127
-        t.today(7, 0x7e)                                           # not signed, many low bits set: alert
-        t.today(4, 0x40).hist(4, 0xff, 0x02, 0x55, 0x7f)           # unsigned on F[-3..-1] + today: pause
-        t.today(11, 0x03).hist(11, 0x01, 0x7f, 0x2a, 0x10, 0x05)   # unsigned on all 5 finals + today: silent
-        t.today(9, E).hist(9, 0x93)                                # on the roster on F[-1], empty today
+                row[i] = 0x08 | (1 + (i * 5 + j * 3) % 247)        # signed, the other bits vary
+        t.today(7, 0xf6)                                           # not signed, many other bits set: alert
+        t.today(4, 0x40).hist(4, 0xff, 0x02, 0x55, 0xf7)           # unsigned on F[-3..-1] + today: pause
+        t.today(11, 0x03).hist(11, 0x01, 0xf7, 0x22, 0x10, 0x05)   # unsigned on all 5 finals + today: silent
+        t.today(9, E).hist(9, 0x9b)                                # on the roster on F[-1], empty today
         r = self.ring(t)
         self.assertNotIn("skip(", r.summary)
         self.assertIn("house dry unsigned=3 alert=1 pause=1 silent=1 groups=1", r.summary)
         self.assertEqual(r.ops("alert", "house")[0]["m"], {"7": [1, 1]})
         self.assertEqual(r.ops("alert", "pause")[0]["m"], {"4": [1, 1]})
         self.assertEqual(r.ops("alert", "empty")[0]["m"], {"9": [1, 1]})
-        self.assertEqual(self.read_state()["signed"], 26)          # 29 taking, 26 with bit 8
+        self.assertEqual(self.read_state()["signed"], 26)          # 29 taking, 26 with the 8
 
     def test_ratio_guards_count_bit_8(self):
         t = Town(30)
         for j, row in enumerate(t.rows):
             for i in range(len(row)):
-                row[i] = (1 + (i * 5 + j * 3) % 127) | (0x80 if i >= 9 else 0)   # 21 of 30 signed every day
+                row[i] = (((1 + (i * 5 + j * 3) % 247) & 0xf7) or 0x01) | (0x08 if i >= 9 else 0)   # 21 of 30 signed every day
         r = self.ring(t)
         self.assertNotIn("skip(", r.summary)
         self.assertEqual(self.read_state()["signed"], 21)
-        t.rows[-1][9] &= 0x7f                                      # 20 of 30 today -> below 0.70
+        t.rows[-1][9] &= 0xf7                                      # 20 of 30 today -> below 0.70
         self.state.unlink()
         self.assertIn("house dry skip(low)", self.ring(t).summary)
 

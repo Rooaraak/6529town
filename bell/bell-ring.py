@@ -32,7 +32,7 @@ ALLOWED_URLS = ("https://6529town.com",)
 RING_PATH = "/api/bell/ring"
 USER_AGENT = "6529town-bell/1 (+https://6529town.com)"
 
-SIGNED_BIT = 0x80          # "bit 8" of a house byte (its high bit): the house signed that day
+SIGNED_BIT = 0x08          # the 8 in a house byte, as the page build writes it (place | 8 signed | 16): the house signed that day
 DAY_SEC = 86400
 CLOSE_AT = 68400           # signing closes 19:00 UTC
 WINDOW_MIN = 4500          # run only if WINDOW_MIN <= close - now <= WINDOW_MAX
