@@ -952,15 +952,44 @@ html.town-snap{scroll-behavior:auto}
     el.textContent = !READ ? "" : old ? "Last reading " + clockOf(READ) + " · " + (h >= 48 ? Math.floor(h / 24) + " days" : h + " h") + " ago"
       : i === DAYS.length - 1 ? "Numbers read " + clockOf(READ) : "";
   }
-  /* a tab left open: every 15 minutes it is in view, ask the site's tiny v.json whether a newer reading is published.
-     Only offers a refresh; never reloads by itself. Anywhere without that file (the private preview) nothing happens. */
-  var freshAt = Date.now();
-  function freshCheck() {
-    if (!READ || document.hidden || Date.now() - freshAt < 15 * 60e3 || !$("s-fresh").hidden || !/^https?:$/.test(location.protocol)) return;
+  /* a tab left open: when it comes back into view, and every 5 minutes it is in view, ask the site's tiny v.json
+     whether a newer reading is published. If one is, the page loads again by itself, but never under the visitor's
+     hands: while a card, the finder, the tour, a postcard, full screen, the music, the day film, a roof-line filter or
+     an older day is on, or the page was touched in the last half minute, it only offers the refresh and tries again
+     at the next tick. One load by itself per reading (remembered in sessionStorage), so a copy that is still behind
+     can never load in a loop. Anywhere without that file (the private preview) nothing happens. */
+  var freshAt = Date.now(), freshNew = "", freshTouch = 0;
+  ["pointerdown", "keydown", "wheel", "touchstart", "scroll"].forEach(function (n) {
+    window.addEventListener(n, function () { freshTouch = Date.now(); }, { capture: true, passive: true });
+  });
+  function freshBusy() { // is the visitor in the middle of something? When in doubt: yes
+    try {
+      var a = document.activeElement;
+      return !!(playing || current !== DAYS.length - 1 || Date.now() - freshTouch < 30e3
+        || $("t-card").classList.contains("on") || $("t-stage").classList.contains("full")
+        || !$("t-find").hidden || !$("t-tour").hidden || !$("pc").hidden || !$("share-pop").hidden
+        || $("snd-go").getAttribute("aria-pressed") === "true"
+        || document.querySelector('#stats button[aria-pressed="true"], #t-legend button[aria-pressed="true"]')
+        || (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)));
+    } catch (e) { return true; }
+  }
+  function freshLoad() { // a newer reading is out (freshNew): offer it, and load it at once when nobody is busy
+    if (!freshNew || document.hidden) return;
+    $("s-fresh").hidden = false; $("s-foot").hidden = false;
+    if (freshBusy()) return;
+    try {
+      if (sessionStorage.getItem("town-fresh") === freshNew) return; // loaded once for this reading and still behind: the button stays
+      sessionStorage.setItem("town-fresh", freshNew);
+    } catch (e) { return; }
+    location.reload();
+  }
+  function freshCheck(back) { // back: the tab has just come into view again
+    if (freshNew) { freshLoad(); return; }
+    if (!READ || document.hidden || Date.now() - freshAt < (back === true ? 60e3 : 5 * 60e3) || !/^https?:$/.test(location.protocol)) return;
     freshAt = Date.now();
     try {
       fetch("v.json", { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (v) {
-        if (v && stampMs(v.captured) > READ) { $("s-fresh").hidden = false; $("s-foot").hidden = false; }
+        if (v && typeof v.captured === "string" && stampMs(v.captured) > READ) { freshNew = v.captured; freshLoad(); }
       }).catch(function () {});
     } catch (e) {}
   }
@@ -1116,7 +1145,7 @@ html.town-snap{scroll-behavior:auto}
   renderStrip();
   renderLegend(); try { renderLegend($("stats")); } catch (e) {}
   setInterval(function () { var d = DAYS[current]; if (d && !d.final) setSigning(d); setRead(current); freshCheck(); }, 30000);
-  document.addEventListener("visibilitychange", freshCheck);
+  document.addEventListener("visibilitychange", function () { freshCheck(true); });
   $("s-fresh").addEventListener("click", function () { location.reload(); });
   try { $("f-final").textContent = localClock("19:30"); } catch (e) {}
   var SITE = "https://6529town.com";
