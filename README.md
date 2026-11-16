@@ -5,6 +5,8 @@ took part send paper planes, and houses that signed send a gold light to the Min
 
 **Live:** https://6529town.com
 
+![6529 Town on 16 Nov 2026, the day named "Slow Grove": 239 houses, one per validator](docs/town.jpg)
+
 Unofficial community project, not made by 6529.
 
 ## What you see
@@ -156,8 +158,9 @@ with `git status` that `raw/`, `data/`, `config.env` and `leak-extra.txt` are no
 ## The bell (optional)
 
 A visitor who found and kept their house can turn on a bell for it. That phone or computer then gets a
-notification when the house has not signed about two hours before signing closes (19:00 UTC), and when a new
-validator version is out. The bell is off until you set it up; until then nothing of it is published and the page
+notification when the house has not signed about two hours before signing closes (19:00 UTC), when the house is
+empty that day (its validator took part before and is not taking part today), and when a new validator version is
+out. The bell is off until you set it up; until then nothing of it is published and the page
 looks and works as before.
 
 | File | What it does |
